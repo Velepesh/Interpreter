@@ -6,71 +6,71 @@ using System.Threading.Tasks;
 
 namespace Interpreter
 {
-    public class Lexer
+    class Lexer
     {
         private List<Terminal> _terminals = new List<Terminal> 
         {
-            //new Terminal("VAR", "^[a-zA-Z_]{1}\\w*$"),
-            new Terminal("VAR", "^[a-zA-Z]*$"),
-            new Terminal("NUMBER", "^0|[1-9][0-9]*$"),
-            new Terminal("ASSIGN_OP", "^=$"),
-            new Terminal("LOGICAL_OP", "==|>|<|!=$"),
-            new Terminal("WHILE_KW", "^while$", 1),
-            new Terminal("FOR_KW", "^for$", 1),
-            new Terminal("IF_KW", "^if$", 1),
-            new Terminal("ELSE_KW", "^else$", 1),
-            new Terminal("DO_KW", "^do$", 1),
-            new Terminal("L_BR", "^\\($"),
-            new Terminal("R_BR", "^\\)$"),
-            new Terminal("L_S_BR", "^\\{$"),
-            new Terminal("R_S_BR", "^\\}$"),
-            new Terminal("SEMICOLON","^;$"),
-            new Terminal("VAR_TYPE", "^int|str|float$", 1),
+            new Terminal(TokenType.WHILE, "^while$", 1),
+            new Terminal(TokenType.FOR, "^for$", 1),
+            new Terminal(TokenType.ELIF, "^elif", 1),
+            new Terminal(TokenType.IF, "^if$", 1),
+            new Terminal(TokenType.ELSE, "^else$", 1),
+            new Terminal(TokenType.DO, "^do$", 1),
+            new Terminal(TokenType.VAR, "^[a-zA-Z]*$"),
+            new Terminal(TokenType.NUMBER, "^0$|^[1-9][0-9]*$"),
+            new Terminal(TokenType.ASSIGN, "^=$"),
+            //new Terminal("LOGICAL_OP", "==|>|<|!=$"),
+            new Terminal(TokenType.EQUAL, "^==$"),
+            new Terminal(TokenType.NOT_EQUAL, "^<>$"),
+            new Terminal(TokenType.GREATER, "^>$"),
+            new Terminal(TokenType.LESS, "^<$"),
+            new Terminal(TokenType.GREATER_EQUAL,">="),
+            new Terminal(TokenType.LESS_EQUAL,"<="),
+            new Terminal(TokenType.LEFT_PAREN, "^\\($"),
+            new Terminal(TokenType.RIGHT_PAREN, "^\\)$"),
+            new Terminal(TokenType.LEFT_BRACE, "^\\{$"),
+            new Terminal(TokenType.RIGTH_BRACE, "^\\}$"),
+            new Terminal(TokenType.SEMICOLON, "^;$"),
+            //new Terminal("VAR_TYPE", "^int|str|float$", 1),
             //new Terminal("OP", "^[+-/*]|\\+\\+|\\-\\-$"),
-            new Terminal("PLUS", "^\\+$"),
-            new Terminal("MINUS", "^\\-$"),
-            new Terminal("MULT", "^\\*$"),
-            new Terminal("DIV", "^\\/$"),
-            new Terminal("WS", "^\\s+$")
+            new Terminal(TokenType.PLUS, "^\\+$"),
+            new Terminal(TokenType.MINUS, "^\\-$"),
+            new Terminal(TokenType.MULT, "^\\*$"),
+            new Terminal(TokenType.DIV, "^\\/$"),
+            new Terminal(TokenType.WHITESPACE, "^\\s+$"),
         };
-               
 
-        //public static void Main(string[] args)
-        //{
-        //    stringBuilder input = new stringBuilder(LookupInput(args));
-        //    List<Token> tokenes = new List<Token>();
-
-        //    while (input[0] != '$')
-        //    {
-        //        Token token = ExtractNextLexeme(input);
-        //        tokenes.Add(token);
-        //        input.Remove(0, token.Value.Length);
-        //    }
-
-        //    Print(tokenes);
-        //}
+        private List<Token> _tokens = new List<Token>();
 
         public void RunLexer(string expression)
         {
             //stringBuilder input = new stringBuilder(LookupInput(args));
             StringBuilder input = new StringBuilder(expression);
-            List<Token> tokenes = new List<Token>();
+
+            input.Append("$");
 
             while (input[0] != '$')
             {
-                Token token = ExtractNextLexeme(input);
+                Token token = ExtractNextToken(input);
                 // tokenes.Add(token);
-                if (!token.Terminal.Identifier.Equals("WS")) 
-                    tokenes.Add(token);
+                if (!(token.Terminal.TokenType == TokenType.WHITESPACE))
+                    _tokens.Add(token);
 
                 input.Remove(0, token.Value.Length);
             }
 
-            Print(tokenes);
+            _tokens.Add(new Token(new Terminal(TokenType.END, ""), ""));//////
+
+            Print(_tokens);
             //Console.ReadKey();
         }
 
-        private Token ExtractNextLexeme(StringBuilder input)
+        public List<Token> GetTokens()
+        {
+            return _tokens;
+        }
+
+        private Token ExtractNextToken(StringBuilder input)
         {
             StringBuilder buffer = new StringBuilder();
 
@@ -140,12 +140,12 @@ namespace Interpreter
         //    return args[0];
         //}
 
-        private void Print(List<Token> tokenes)
+        private void Print(List<Token> tokens)
         {
-            foreach (Token token in tokenes)
+            foreach (Token token in tokens)
             {
                 //Console.WriteLine("[%s, %s]%n", token.Terminal.Identifier, token.Value);
-                Console.WriteLine($"[{token.Terminal.Identifier}], {token.Value}");
+                Console.WriteLine($"[{token.Terminal.TokenType}], {token.Value}");
             }
         }
     }

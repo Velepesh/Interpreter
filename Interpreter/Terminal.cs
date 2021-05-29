@@ -9,7 +9,8 @@ namespace Interpreter
 {
     class Terminal
     {
-        public string Identifier { get; private set; }
+        //public string Identifier { get; private set; }
+        public TokenType TokenType { get; private set; }
         private string _pattern;
         public int Priority { get; private set; }
 
@@ -18,9 +19,9 @@ namespace Interpreter
         //    this(identifier, pattern, 0);
         //}
 
-        public Terminal(string identifier, string pattern, int priority = 0)
+        public Terminal(TokenType tokenType, string pattern, int priority = 0)
         {
-            Identifier = identifier;
+            TokenType = tokenType;
             _pattern = pattern;
              Priority = priority;
         }

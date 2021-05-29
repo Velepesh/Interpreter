@@ -12,21 +12,25 @@
     MULT, 
     DIV, 
     
-    SEMICOLON, 
+    SEMICOLON,
+    ASSIGN,
     
     WHITESPACE,
 
     EQUAL, 
     EQUAL_EQUAL, 
     GREATER,
-    LESS, 
+    GREATER_EQUAL,
+    LESS,
+    LESS_EQUAL,
     NOT_EQUAL,
 
     IDENTIFIER,
     NUMBER,
 
     AND, 
-    ELSE, 
+    ELSE,
+    ELIF, 
     FALSE,
     TRUE,
     IF, 
@@ -36,4 +40,6 @@
     WHILE, 
     FOR,
     DO,
+
+    END,
 }

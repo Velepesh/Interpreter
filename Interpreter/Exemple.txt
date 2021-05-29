@@ -1,0 +1,7 @@
+﻿num = 10;
+i = 0;
+while (Par <> 0) 
+{
+    Par = Par - 1;
+    index = index + 10;
+}

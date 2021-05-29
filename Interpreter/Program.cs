@@ -1,22 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace Interpreter
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
-        {
-            string expression = "var a var b  var c = a * b$";
-           // string expression = "var c = a * b$";
+       public static void Main(string[] args)
+       {
+            string expression = "";
+            // string expression = "var c = a * b$";
             //string expression = "a * b c / d 4 + 3$";
 
-            Lexer lexer = new Lexer();
+            string writePath = @"..\..\Exemple.txt";
 
+            try
+            {
+                using (StreamReader streamReader = new StreamReader(writePath))
+                {
+                    expression = streamReader.ReadToEnd();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            Lexer lexer = new Lexer();
             lexer.RunLexer(expression);
+            //Console.WriteLine(" ++++++          " + lexer.GetTokens()[lexer.GetTokens().Count-1].Terminal.TokenType);
+            Parser parser = new Parser(lexer.GetTokens());
+            parser.analysis();
+            parser.AstNode.print();
         }
     }
 }
