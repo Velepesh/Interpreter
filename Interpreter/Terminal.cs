@@ -9,15 +9,10 @@ namespace Interpreter
 {
     class Terminal
     {
-        //public string Identifier { get; private set; }
-        public TokenType TokenType { get; private set; }
         private string _pattern;
-        public int Priority { get; private set; }
 
-        //public Terminal(string identifier, string pattern)
-        //{
-        //    this(identifier, pattern, 0);
-        //}
+        public TokenType TokenType { get; private set; }
+        public int Priority { get; private set; }
 
         public Terminal(TokenType tokenType, string pattern, int priority = 0)
         {
@@ -26,10 +21,9 @@ namespace Interpreter
              Priority = priority;
         }
 
-        public bool Matches(string charSequence)
+        public bool IsMatches(string charSequence)
         {
             return Regex.IsMatch(charSequence, _pattern);
-            //return _pattern.matcher(charSequence).matches();
         }
     }
 }

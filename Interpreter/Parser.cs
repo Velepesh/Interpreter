@@ -1,66 +1,59 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Interpreter
 {
     class Parser
     {
         private List<Token> _tokens = new List<Token>();
-        private int _position;
+        private int _position = 0;
+        private TokenType _currentTokenType => Peek();
 
         public AstNode AstNode { get; private set; }
+
 
         public Parser(List<Token> tokens)
         { 
             _tokens = tokens;
-            _position = 0;
         }
 
-        public void analysis()
+        public void Analysis()
         {
-            //long time_analysis = System.nanoTime();
+            AstNode = new AstNode(NodeType.language);
 
-            AstNode = new AstNode(NodeType.Language);
-
-            //while (currentTokenType() != TokenType.END)
-            while (currentTokenType() != TokenType.END)
+            //while (_tokens.Count >= _position)
+            while (_tokens.Count > _position)
             {
                 try
                 {
-                    languageConst(AstNode);
+                    Language(AstNode);
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Синтаксическая ошибка: " + _position + " " + currentTokenType());
-                    //e.printStackTrace();
-                    //e.StackTrace;
+                    Console.WriteLine("Синтаксическая ошибка: " + _position + " " + _currentTokenType);
                     Console.WriteLine(e.StackTrace);
                     break;
                 }
             }
-
-           // Console.WriteLine("[Parser] time analysis: " + (System.nanoTime() - time_analysis) / 1_000_000.0 + "ms");
         }
 
-        private void languageConst(AstNode astTop)
+        private void Language(AstNode astTop)
         {
-            AstNode astNext = new AstNode(NodeType.LanguageConst);
-            astTop.addNode(astNext);
+            AstNode astNode = new AstNode(NodeType.lang_expr);
 
-            if (currentTokenType() == TokenType.VAR) 
+            astTop.AddNode(astNode);
+
+            if (_currentTokenType == TokenType.VAR) 
             {
-                assignConst(astNext);
+                AssignExpr(astNode);
             } 
-            else if (currentTokenType() == TokenType.WHILE) 
+            else if (_currentTokenType == TokenType.WHILE) 
             {
-                whileConst(astNext);
+                WhileExpr(astNode);
             }
-            else if (currentTokenType() == TokenType.IF)
+            else if (_currentTokenType == TokenType.IF)
             {
-                ifConst(astNext);
+                IfExpr(astNode);
             }
             else
             {
@@ -68,89 +61,103 @@ namespace Interpreter
             }
         }
 
-        private void ifConst(AstNode astTop)
+        private void AssignExpr(AstNode astTop)
         {
-            AstNode astNext = new AstNode(NodeType.IfConst);
-            astTop.addNode(astNext);
+            AstNode astNode = new AstNode(NodeType.assign_expr);
+            astTop.AddNode(astNode);
 
-            astNext.addLeaf(LexCheck(TokenType.IF));
-            astNext.addLeaf(LexCheck(TokenType.LEFT_PAREN));
-            expression(astNext);
-            astNext.addLeaf(LexCheck(TokenType.RIGHT_PAREN));
-            block(astNext);
+            astNode.AddLeaf(Check(TokenType.VAR));
+            astNode.AddLeaf(Check(TokenType.ASSIGN));
 
-            while (currentTokenType() == TokenType.ELIF)
-                elifConst(astNext);
+            Expression(astNode);
 
-            if (currentTokenType() == TokenType.ELSE)
-                elseConst(astNext);
+            astNode.AddLeaf(Check(TokenType.SEMICOLON));
         }
 
-        private void elifConst(AstNode astTop)
+        private void IfExpr(AstNode astTop)
         {
-            AstNode astNext = new AstNode(NodeType.ElifConst);
-            astTop.addNode(astNext);
+            AstNode astNode = new AstNode(NodeType.if_expr);
+            astTop.AddNode(astNode);
 
-            astNext.addLeaf(LexCheck(TokenType.ELIF));
-            astNext.addLeaf(LexCheck(TokenType.LEFT_PAREN));
-            expression(astNext);
-            astNext.addLeaf(LexCheck(TokenType.RIGHT_PAREN));
-            block(astNext);
+            astNode.AddLeaf(Check(TokenType.IF));
+            astNode.AddLeaf(Check(TokenType.LEFT_PAREN));
+
+            Expression(astNode);
+
+            astNode.AddLeaf(Check(TokenType.RIGHT_PAREN));
+
+            Block(astNode);
+
+            while (_currentTokenType == TokenType.ELIF)
+                ElifExpr(astNode);
+
+            if (_currentTokenType == TokenType.ELSE)
+                ElseExpr(astNode);
         }
 
-        private void elseConst(AstNode astTop)
+        private void ElifExpr(AstNode astTop)
         {
-            AstNode astNext = new AstNode(NodeType.ElseConst);
-            astTop.addNode(astNext);
+            AstNode astNode = new AstNode(NodeType.elif_expr);
+            astTop.AddNode(astNode);
 
-            astNext.addLeaf(LexCheck(TokenType.ELSE));
-            block(astNext);
+            astNode.AddLeaf(Check(TokenType.ELIF));
+            astNode.AddLeaf(Check(TokenType.LEFT_PAREN));
+
+            Expression(astNode);
+
+            astNode.AddLeaf(Check(TokenType.RIGHT_PAREN));
+
+            Block(astNode);
         }
 
-        private void whileConst(AstNode astTop)
+        private void ElseExpr(AstNode astTop)
         {
-            AstNode astNext = new AstNode(NodeType.WhileConst);
-            astTop.addNode(astNext);
+            AstNode astNode = new AstNode(NodeType.else_expr);
 
-            astNext.addLeaf(LexCheck(TokenType.WHILE));
-            astNext.addLeaf(LexCheck(TokenType.LEFT_PAREN));
-            expression(astNext);
-            astNext.addLeaf(LexCheck(TokenType.RIGHT_PAREN));
-            block(astNext);
+            astTop.AddNode(astNode);
+            astNode.AddLeaf(Check(TokenType.ELSE));
+
+            Block(astNode);
         }
 
-        private void block(AstNode astTop)
+        private void WhileExpr(AstNode astTop)
         {
-            AstNode astNext = new AstNode(NodeType.Block);
-            astTop.addNode(astNext);
+            AstNode astNode = new AstNode(NodeType.while_expr);
+
+            astTop.AddNode(astNode);
+
+            astNode.AddLeaf(Check(TokenType.WHILE));
+            astNode.AddLeaf(Check(TokenType.LEFT_PAREN));
+
+            Expression(astNode);
+
+            astNode.AddLeaf(Check(TokenType.RIGHT_PAREN));
+
+            Block(astNode);
+        }
+
+        private void Block(AstNode astTop)
+        {
+            AstNode astNode = new AstNode(NodeType.block);
+
+            astTop.AddNode(astNode);
             
-            if (currentTokenType() == TokenType.LEFT_BRACE)
+            if (_currentTokenType == TokenType.LEFT_BRACE)
             {
-                astNext.addLeaf(LexCheck(TokenType.LEFT_BRACE));
+                astNode.AddLeaf(Check(TokenType.LEFT_BRACE));
             
-                while (currentTokenType() != TokenType.RIGTH_BRACE)
-                    languageConst(astNext);
+                while (_currentTokenType != TokenType.RIGTH_BRACE)
+                    Language(astNode);
             
-                astNext.addLeaf(LexCheck(TokenType.RIGTH_BRACE));
+                astNode.AddLeaf(Check(TokenType.RIGTH_BRACE));
             }
             else
             {
-                languageConst(astNext);
+                Language(astNode);
             }
         }
 
-        private void assignConst(AstNode astTop)
-        {
-            AstNode astNext = new AstNode(NodeType.AssignConst);
-            astTop.addNode(astNext);
-            
-            astNext.addLeaf(LexCheck(TokenType.VAR));
-            astNext.addLeaf(LexCheck(TokenType.ASSIGN));
-            expression(astNext);
-            astNext.addLeaf(LexCheck(TokenType.SEMICOLON));
-        }
-
-        private bool isOp(TokenType type)
+        private bool IsOperator(TokenType type)
         {
             return type == TokenType.PLUS || type == TokenType.MINUS 
                 || type == TokenType.DIV || type == TokenType.MULT 
@@ -159,87 +166,100 @@ namespace Interpreter
                 || type == TokenType.GREATER_EQUAL || type == TokenType.NOT_EQUAL;
         }       
 
-        private void expression(AstNode astTop)
+        private void Expression(AstNode astTop)
         {
-            AstNode astNext = new AstNode(NodeType.Expression);
-            astTop.addNode(astNext);
+            AstNode astNode = new AstNode(NodeType.expression);
+
+            astTop.AddNode(astNode);
         
-            if (currentTokenType() == TokenType.NUMBER || currentTokenType() == TokenType.VAR)
+            if (_currentTokenType == TokenType.NUMBER || _currentTokenType == TokenType.VAR)
             {
-            
-                member(astNext);
+                Member(astNode);
             }
-            else if (currentTokenType() == TokenType.LEFT_PAREN)
-            {
-            
-                memberBracket(astNext);
+            else if (_currentTokenType == TokenType.LEFT_PAREN)
+            {      
+                BracketMember(astNode);
             }
             else
             {
                 throw new Exception();
             }
             
-            while (isOp(currentTokenType()))
-            {
-            
-                op(astNext);
-                expression(astNext);
+            while (IsOperator(_currentTokenType))
+            { 
+                Operator(astNode);
+                Expression(astNode);
             }
         }
 
-        private void op(AstNode astTop)
+        private void Operator(AstNode astTop)
         {
-            AstNode astNext = new AstNode(NodeType.Op);
-            astTop.addNode(astNext);
+            AstNode astNode = new AstNode(NodeType.op);
+            astTop.AddNode(astNode);
 
-            if (isOp(currentTokenType()))
-                astNext.addLeaf(getNextToken());
+            if (IsOperator(_currentTokenType))
+                astNode.AddLeaf(GetNextToken());
             else
                 throw new Exception();
         }
 
-        private void memberBracket(AstNode astTop)
+        private void BracketMember(AstNode astTop)
         {
-            AstNode astNext = new AstNode(NodeType.BracketMember);
-            astTop.addNode(astNext);
+            AstNode astNode = new AstNode(NodeType.bracket_member);
+            astTop.AddNode(astNode);
 
-            astNext.addLeaf(LexCheck(TokenType.LEFT_PAREN));
-            expression(astNext);
-            astNext.addLeaf(LexCheck(TokenType.RIGHT_PAREN));
+            astNode.AddLeaf(Check(TokenType.LEFT_PAREN));
+            Expression(astNode);
+            astNode.AddLeaf(Check(TokenType.RIGHT_PAREN));
         }
 
-        private void member(AstNode astTop)
+        private void Member(AstNode astTop)
         {
-            AstNode astNext = new AstNode(NodeType.Member);
-            astTop.addNode(astNext);
+            AstNode astNode = new AstNode(NodeType.member);
+            astTop.AddNode(astNode);
         
-            if (currentTokenType() == TokenType.NUMBER || currentTokenType() == TokenType.VAR)
-                astNext.addLeaf(getNextToken());
+            if (_currentTokenType == TokenType.NUMBER || _currentTokenType == TokenType.VAR)
+                astNode.AddLeaf(GetNextToken());
             else
                 throw new Exception();
         }
 
-        private Token LexCheck(TokenType type)
+        private Token Check(TokenType tokenType)
         {
-            if (currentTokenType() != type)
-                throw new Exception();
-            else
-                return _tokens[_position++];
+            if (_currentTokenType != tokenType)
+            {
+                throw new Exception("Unexpected: " + tokenType + " currentTokenType " + _currentTokenType);
+            }
+
+            //_tokens.RemoveAt(0);
+            return _tokens[_position++];
+            //if (_currentTokenType != tokenType)
+            //    throw new Exception();
+            //else
+            //    return _tokens[_position++];
         }
         
-        private Token getNextToken()
+        private Token GetNextToken()
         {
             return _tokens[_position++];
         }
 
-        private TokenType currentTokenType()
+        private void Match(TokenType tokenType)
         {
-            return _tokens[_position].Terminal.TokenType;
+            if (_currentTokenType != tokenType)
+            {
+                throw new Exception("Unexpected: " + tokenType + " currentTokenType " + _currentTokenType);
+            }
+
+            _tokens.RemoveAt(0);
         }
 
-        public AstNode getTree()
+        private TokenType Peek()
         {
-            return AstNode;
+            if (_position >= _tokens.Count)
+                return _tokens[_tokens.Count - 1].TokenType;
+
+            return _tokens[_position].TokenType;
         }
     }
 }

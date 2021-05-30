@@ -19,7 +19,6 @@ namespace Interpreter
             new Terminal(TokenType.VAR, "^[a-zA-Z]*$"),
             new Terminal(TokenType.NUMBER, "^0$|^[1-9][0-9]*$"),
             new Terminal(TokenType.ASSIGN, "^=$"),
-            //new Terminal("LOGICAL_OP", "==|>|<|!=$"),
             new Terminal(TokenType.EQUAL, "^==$"),
             new Terminal(TokenType.NOT_EQUAL, "^<>$"),
             new Terminal(TokenType.GREATER, "^>$"),
@@ -44,7 +43,6 @@ namespace Interpreter
 
         public void RunLexer(string expression)
         {
-            //stringBuilder input = new stringBuilder(LookupInput(args));
             StringBuilder input = new StringBuilder(expression);
 
             input.Append("$");
@@ -52,17 +50,14 @@ namespace Interpreter
             while (input[0] != '$')
             {
                 Token token = ExtractNextToken(input);
-                // tokenes.Add(token);
-                if (!(token.Terminal.TokenType == TokenType.WHITESPACE))
+
+                if (!(token.TokenType == TokenType.WHITESPACE))
                     _tokens.Add(token);
 
                 input.Remove(0, token.Value.Length);
             }
 
-            _tokens.Add(new Token(new Terminal(TokenType.END, ""), ""));//////
-
             Print(_tokens);
-            //Console.ReadKey();
         }
 
         public List<Token> GetTokens()
@@ -83,11 +78,11 @@ namespace Interpreter
                     buffer.Append(input[buffer.Length]);
                 }
 
-                buffer.Remove(buffer.Length - 1, 1);//?
+                buffer.Remove(buffer.Length - 1, 1);
 
                 List<Terminal> terminals = LookupTerminals(buffer);
 
-                return new Token(GetPrioritizedTerminal(terminals), buffer.ToString());
+                return new Token(GetPrioritizedTerminal(terminals).TokenType, buffer.ToString());
             }
             else
             {
@@ -121,7 +116,7 @@ namespace Interpreter
 
             foreach (Terminal terminal in _terminals)
             {
-                if (terminal.Matches(buffer.ToString()))
+                if (terminal.IsMatches(buffer.ToString()))
                 {
                     terminals.Add(terminal);
                 }
@@ -130,22 +125,11 @@ namespace Interpreter
             return terminals;
         }
 
-        //private string LookupInput(string[] args)
-        //{
-        //    if (args.Length == 0)
-        //    {
-        //        throw new ArgumentException("Input string not found");
-        //    }
-
-        //    return args[0];
-        //}
-
         private void Print(List<Token> tokens)
         {
             foreach (Token token in tokens)
             {
-                //Console.WriteLine("[%s, %s]%n", token.Terminal.Identifier, token.Value);
-                Console.WriteLine($"[{token.Terminal.TokenType}], {token.Value}");
+                Console.WriteLine($"[{token.TokenType}], {token.Value}");
             }
         }
     }

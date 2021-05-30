@@ -8,14 +8,12 @@ namespace Interpreter
        public static void Main(string[] args)
        {
             string expression = "";
-            // string expression = "var c = a * b$";
-            //string expression = "a * b c / d 4 + 3$";
 
-            string writePath = @"..\..\Exemple.txt";
+            string path = @"..\..\Exemple.txt";
 
             try
             {
-                using (StreamReader streamReader = new StreamReader(writePath))
+                using (StreamReader streamReader = new StreamReader(path))
                 {
                     expression = streamReader.ReadToEnd();
                 }
@@ -26,11 +24,13 @@ namespace Interpreter
             }
 
             Lexer lexer = new Lexer();
+
             lexer.RunLexer(expression);
-            //Console.WriteLine(" ++++++          " + lexer.GetTokens()[lexer.GetTokens().Count-1].Terminal.TokenType);
+            
             Parser parser = new Parser(lexer.GetTokens());
-            parser.analysis();
-            parser.AstNode.print();
+
+            parser.Analysis();
+            parser.AstNode.Print();
         }
     }
 }

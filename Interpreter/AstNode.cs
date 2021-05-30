@@ -8,97 +8,78 @@ namespace Interpreter
 {
     class AstNode
     {
-        private NodeType type;
-        private List<AstNode> nodes;
-        private List<Token> leafs;
+        private List<AstNode> _nodes = new List<AstNode>();
+        private List<Token> _leafs = new List<Token>();
+
+        public NodeType Type { get; private set; }
 
         public AstNode(NodeType type)
         {
-
-            this.type = type;
-            this.leafs = new List<Token>();
-            this.nodes = new List<AstNode>();
+            Type = type;
         }
 
         public AstNode(NodeType type, List<AstNode> nodes, List<Token> leafs)
         {
-
-            this.type = type;
-            this.leafs = leafs;
-            this.nodes = nodes;
+            Type = type;
+            _nodes = nodes;
+            _leafs = leafs;
         }
 
-        public void addLeaf(Token leaf)
+        public void AddLeaf(Token leaf)
         {
-
-            leafs.Add(leaf);
+            _leafs.Add(leaf);
         }
 
-        public void addNode(AstNode node)
+        public void AddNode(AstNode node)
         {
-
-            nodes.Add(node);
+            _nodes.Add(node);
         }
 
-        public void print()
+        public void Print()
         {
-
-            this.printNext("", "", "", true);
+            PrintNext("", "", "", true);
         }
 
-        private void printNext(string format, string format2, string format3, bool last)
+        public List<AstNode> GetNodes()
         {
+            return _nodes;
+        }
 
+        public List<Token> GetLeafs()
+        {
+            return _leafs;
+        }
+
+        private void PrintNext(string format, string format2, string format3, bool last)
+        {
             if (last)
                 Console.Write(format2);
             else
                 Console.Write(format3);
 
-                 Console.WriteLine("╥" + type);
+                Console.WriteLine("." + Type);
 
-            for (int i = 0; i < leafs.Count; i++)
+            for (int i = 0; i < _leafs.Count; i++)
             {
-
-                if (i == leafs.Count - 1 && this.nodes.Count == 0)
+                if (i == _leafs.Count - 1 && this._nodes.Count == 0)
                 {
-
-                    Console.Write(format + "╙────");
-                    Console.WriteLine(leafs[i].Terminal.TokenType + (leafs[i].Value == null ? "" : (" (" + leafs[i].Value + ")")));
+                    Console.Write(format + "└──");
+                    Console.WriteLine(_leafs[i].TokenType + (_leafs[i].Value == null ? "" : (" (" + _leafs[i].Value + ")")));
                 }
                 else
                 {
-
-                    Console.Write(format + "╟────");
-                    Console.WriteLine(leafs[i].Terminal.TokenType + (leafs[i].Value == null ? "" : (" (" + leafs[i].Value + ")")));
+                    Console.Write(format + "├──");
+                    Console.WriteLine(_leafs[i].TokenType + (_leafs[i].Value == null ? "" : (" (" + _leafs[i].Value + ")")));
                 }
             }
 
-            for (int i = 0; i < nodes.Count; i++)
+            for (int i = 0; i < _nodes.Count; i++)
             {
-
-                if (i == nodes.Count - 1)
-                    nodes[i].printNext(format + "     ", format + "╟────", format + "╙────", false);
+                if (i == _nodes.Count - 1)
+                    _nodes[i].PrintNext(format + "   ", format + "├──", format + "└──", false);
                 else
-                    nodes[i].printNext(format + "║    ", format + "╟────", format + "╙────", true);
+                    _nodes[i].PrintNext(format + "│  ", format + "├──", format + "└──", true);
             }
-        }
-
-        public NodeType getType()
-        {
-
-            return type;
-        }
-
-        public List<AstNode> getNodes()
-        {
-
-            return nodes;
-        }
-
-        public List<Token> getLeafs()
-        {
-
-            return leafs;
         }
     }
 }

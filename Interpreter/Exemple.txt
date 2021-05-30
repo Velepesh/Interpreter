@@ -2,6 +2,6 @@
 i = 0;
 while (Par <> 0) 
 {
-    Par = Par - 1;
+    Par = (Par - 1) * 2;
     index = index + 10;
 }

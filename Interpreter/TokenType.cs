@@ -41,5 +41,7 @@
     FOR,
     DO,
 
-    END,
+    JMP_VALUE,
+    JMP,
+    BOOLEAN,
 }
