@@ -24,7 +24,9 @@ namespace Interpreter
 
         public void Println()
         {
-            Console.WriteLine(("%-20s%-20s\n", TokenType, Value == null ? " " : Value);
+            //Console.WriteLine(String.Format("Х20s%-20s\n", TokenType, Value == null ? " " : Value));
+            string value = Value == null ? " " : Value;
+            Console.WriteLine($"{TokenType, -20}{value, -20}");
         }
     }
 }

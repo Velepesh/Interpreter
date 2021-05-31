@@ -31,6 +31,13 @@ namespace Interpreter
 
             parser.Analysis();
             parser.AstNode.Print();
+
+            TranslatorRPN RPN = new TranslatorRPN(parser.AstNode);
+            RPN.translate();
+            RPN.print();
+            StackMachine machine = new StackMachine(RPN.getRPN());
+            machine.run();
+            machine.print();
         }
     }
 }

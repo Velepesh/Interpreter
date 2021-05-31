@@ -28,29 +28,24 @@ namespace Interpreter
 
         private void languageConst(AstNode node)
         {
-
             AstNode nodeConst = node.GetNodes()[0];
 
             if (nodeConst.Type == NodeType.assign_expr)
             {
-
                 assignConst(nodeConst);
             }
             else if (nodeConst.Type == NodeType.if_expr)
             {
-
                 ifConst(nodeConst);
             }
             else if (nodeConst.Type == NodeType.while_expr)
             {
-
                 whileConst(nodeConst);
             }
         }
 
         private void whileConst(AstNode nodeConst)
         {
-
             int start = RPN.Count;
 
             expression(nodeConst.GetNodes()[0]);
@@ -72,7 +67,6 @@ namespace Interpreter
 
         private void ifConst(AstNode nodeConst)
         {
-
             expression(nodeConst.GetNodes()[0]);
             flushTexas();
 
@@ -90,7 +84,6 @@ namespace Interpreter
 
             for (int i = 2; i < nodeConst.GetNodes().Count; i++)
             {
-
                 if (nodeConst.GetNodes()[i].Type == NodeType.elif_expr)
                 {
 
@@ -108,7 +101,6 @@ namespace Interpreter
 
         private void elifConst(AstNode nodeConst, Token endPoint)
         {
-
             expression(nodeConst.GetNodes()[0]);
             flushTexas();
 
@@ -126,13 +118,11 @@ namespace Interpreter
 
         private void elseConst(AstNode nodeConst)
         {
-
             block(nodeConst.GetNodes()[0]);
         }
 
         private void block(AstNode topNode)
         {
-
             foreach (AstNode node in topNode.GetNodes())
             {
 
@@ -142,7 +132,6 @@ namespace Interpreter
 
         private void assignConst(AstNode nodeConst)
         {
-
             addOprand(nodeConst.GetLeafs()[0]);
             addOperator(nodeConst.GetLeafs()[1]);
             expression(nodeConst.GetNodes()[0]);
@@ -151,17 +140,14 @@ namespace Interpreter
 
         private void expression(AstNode topNode)
         {
-
             List<AstNode> nextNodes = topNode.GetNodes();
 
             if (nextNodes[0].Type == NodeType.member)
             {
-
                 member(nextNodes[0]);
             }
             else if (nextNodes[0].Type == NodeType.bracket_member)
             {
-
                 bracketMember(nextNodes[0]);
             }
             if (nextNodes.Count > 1)
@@ -173,7 +159,6 @@ namespace Interpreter
 
         private void bracketMember(AstNode node)
         {
-
             addOperator(node.GetLeafs()[0]);
             expression(node.GetNodes()[0]);
             addOperator(node.GetLeafs()[1]);
@@ -181,19 +166,16 @@ namespace Interpreter
 
         private void op(AstNode node)
         {
-
             addOperator(node.GetLeafs()[0]);
         }
 
         private void member(AstNode node)
         {
-
             addOprand(node.GetLeafs()[0]);
         }
 
         private int opPriority(Token op)
         {
-
             int priority;
 
             if (op.TokenType == TokenType.ASSIGN)
@@ -224,13 +206,11 @@ namespace Interpreter
 
         private void addOprand(Token token)
         {
-
             RPN.Add(token);
         }
 
         private void addOperator(Token token)
         {
-
             if (token.TokenType == TokenType.LEFT_PAREN)
             {
                 _tokens.AddFirst(token);
@@ -239,11 +219,9 @@ namespace Interpreter
 
             if (token.TokenType == TokenType.RIGHT_PAREN)
             {
-
-                while (_tokens.peek().Type != TokenType.LEFT_PAREN)
+                while (_tokens.First.Value.TokenType != TokenType.LEFT_PAREN)
                 {
-
-                    RPN.Add(_tokens.removeFirst());
+                    AddRPN();
                 }
 
                 _tokens.RemoveFirst();
@@ -252,12 +230,12 @@ namespace Interpreter
 
             while (true)
             {
-
-                if (_tokens.peek() != null && opPriority(_tokens.peek()) > opPriority(token))
-                    RPN.Add(_tokens.removeFirst());
+                if (_tokens.First != null && opPriority(_tokens.First.Value) > opPriority(token))
+                {
+                    AddRPN();
+                }
                 else
                 {
-
                     _tokens.AddFirst(token);
                     return;
                 }
@@ -266,29 +244,33 @@ namespace Interpreter
 
         private void flushTexas()
         {
-
             int size = _tokens.Count;
 
             for (int i = 0; i < size; i++)
             {
-
-                RPN.Add(_tokens.removeFirst());
+                AddRPN();
+               // RPN.Add(_tokens.removeFirst());
             }
         }
-
         public void print()
         {
-
             Console.WriteLine("[RPN translator] reverse polish notation: ");
-            Console.Write("%-4s%-20s%-20s\n", "№", "Name token", "Value");
+            //Console.Write("%-4s%-20s%-20s\n", "№", "Name token", "Value");
+            Console.Write($"{"№",-4} {"Name token",-20}{"Value",-20}\n");
 
             int i = 0;
 
             foreach (Token token in RPN)
             {
-                Console.Write("%-4s", i++);
+                //Console.Write("%-4s", i++);
+                Console.Write($"{i++, -4}");
                 token.Println();
             }
+        }
+        private void AddRPN()
+        {
+            RPN.Add(_tokens.First.Value);
+            _tokens.RemoveFirst();
         }
 
         public List<Token> getRPN()
