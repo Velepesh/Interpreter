@@ -6,6 +6,7 @@
     RIGTH_BRACE,
 
     COMMA, 
+    DOT,
 
     MINUS, 
     PLUS, 
@@ -27,7 +28,7 @@
 
     IDENTIFIER,
     NUMBER,
-
+    
     AND, 
     ELSE,
     ELIF, 
@@ -35,11 +36,15 @@
     TRUE,
     IF, 
     OR,
-    PRINT, 
+    PRINT,
+    LINKED_LIST,
+    HASH_SET,
     VAR, 
     WHILE, 
+    END,
     FOR,
     DO,
+    FUNC,
 
     JMP_VALUE,
     JMP,

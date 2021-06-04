@@ -37,6 +37,7 @@ namespace Interpreter
 
         public void Print()
         {
+            Console.WriteLine("\nAST\n");
             PrintNext("", "", "", true);
         }
 

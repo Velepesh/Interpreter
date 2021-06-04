@@ -1,7 +1,35 @@
-﻿Par = 10;
-index = 0;
+﻿a = 5;
+b = 4;
 
-while (Par <> 0) {
-    Par = Par - 1;
-    index = index + 10;
+LinkedList linkedList;
+HashSet hashSet;
+
+linkedList.Add(0, 1);
+linkedList.Add(0, 2);
+linkedList.Add(0, 3);
+linkedList.Add(0, 3);
+
+hashSet.Add(10);
+hashSet.Add(10);
+hashSet.Add(5);
+hashSet.Add(5);
+hashSet.Add(13);
+hashSet.Remove(5);
+
+if (linkedList.Contains(5)) 
+{
+	d = 2;
+} 
+else 
+{
+	d = 10 + a * 2;
 }
+
+hashSet.PrintSet();
+
+linkedList.PrintList();
+
+Print a;
+Print b;
+c = a + b + d;
+Print c;

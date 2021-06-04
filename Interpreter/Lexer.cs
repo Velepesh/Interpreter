@@ -10,14 +10,23 @@ namespace Interpreter
     {
         private List<Terminal> _terminals = new List<Terminal> 
         {
+            new Terminal(TokenType.PLUS, "^\\+$"),
+            new Terminal(TokenType.MINUS, "^\\-$"),
+            new Terminal(TokenType.MULT, "^\\*$"),
+            new Terminal(TokenType.DIV, "^\\/$"),
             new Terminal(TokenType.WHILE, "^while$", 1),
             new Terminal(TokenType.FOR, "^for$", 1),
             new Terminal(TokenType.ELIF, "^elif", 1),
             new Terminal(TokenType.IF, "^if$", 1),
             new Terminal(TokenType.ELSE, "^else$", 1),
             new Terminal(TokenType.DO, "^do$", 1),
+            new Terminal(TokenType.PRINT, "^Print$"),
+            new Terminal(TokenType.LINKED_LIST, "^LinkedList$"),
+            new Terminal(TokenType.HASH_SET, "^HashSet$"),
             new Terminal(TokenType.VAR, "^[a-zA-Z]*$"),
             new Terminal(TokenType.NUMBER, "^0$|^[1-9][0-9]*$"),
+            new Terminal(TokenType.WHITESPACE, "^\\s+$"),
+            new Terminal(TokenType.SEMICOLON, "^;$"),
             new Terminal(TokenType.ASSIGN, "^=$"),
             new Terminal(TokenType.EQUAL, "^==$"),
             new Terminal(TokenType.NOT_EQUAL, "^<>$"),
@@ -29,14 +38,12 @@ namespace Interpreter
             new Terminal(TokenType.RIGHT_PAREN, "^\\)$"),
             new Terminal(TokenType.LEFT_BRACE, "^\\{$"),
             new Terminal(TokenType.RIGTH_BRACE, "^\\}$"),
-            new Terminal(TokenType.SEMICOLON, "^;$"),
+            new Terminal(TokenType.COMMA, "^,$"),
+            new Terminal(TokenType.DOT, "^.$"),
             //new Terminal("VAR_TYPE", "^int|str|float$", 1),
             //new Terminal("OP", "^[+-/*]|\\+\\+|\\-\\-$"),
-            new Terminal(TokenType.PLUS, "^\\+$"),
-            new Terminal(TokenType.MINUS, "^\\-$"),
-            new Terminal(TokenType.MULT, "^\\*$"),
-            new Terminal(TokenType.DIV, "^\\/$"),
-            new Terminal(TokenType.WHITESPACE, "^\\s+$"),
+
+           
         };
 
         private List<Token> _tokens = new List<Token>();
@@ -58,6 +65,8 @@ namespace Interpreter
             }
 
             Print(_tokens);
+
+            _tokens.Add(new Token(TokenType.END, ""));
         }
 
         public List<Token> GetTokens()

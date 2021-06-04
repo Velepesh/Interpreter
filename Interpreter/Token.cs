@@ -16,16 +16,22 @@ namespace Interpreter
             TokenType = tokenType;
             Value = value;
         }
+        public Token(TokenType tokenType, int value)
+        {
+            TokenType = tokenType;
+            Value = Convert.ToString(value);
+        }
 
         public void SetValue(string value)
         {
             Value = value;
         }
 
+
         public void Println()
         {
-            //Console.WriteLine(String.Format("Х20s%-20s\n", TokenType, Value == null ? " " : Value));
             string value = Value == null ? " " : Value;
+
             Console.WriteLine($"{TokenType, -20}{value, -20}");
         }
     }

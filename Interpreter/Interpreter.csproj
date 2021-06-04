@@ -44,7 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AstNode.cs" />
+    <Compile Include="Element.cs" />
     <Compile Include="Lexer.cs" />
+    <Compile Include="MyHashSet.cs" />
+    <Compile Include="MyLinkedList.cs" />
     <Compile Include="NodeType.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Program.cs" />
@@ -53,7 +56,7 @@
     <Compile Include="Terminal.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TokenType.cs" />
-    <Compile Include="TranslatorRPN.cs" />
+    <Compile Include="Rpn.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

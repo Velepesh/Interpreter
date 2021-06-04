@@ -32,12 +32,15 @@ namespace Interpreter
             parser.Analysis();
             parser.AstNode.Print();
 
-            TranslatorRPN RPN = new TranslatorRPN(parser.AstNode);
-            RPN.translate();
-            RPN.print();
-            StackMachine machine = new StackMachine(RPN.getRPN());
-            machine.run();
-            machine.print();
+            Rpn rpn = new Rpn(parser.AstNode);
+
+            rpn.Translate();
+            rpn.Print();
+
+            StackMachine stackMachine = new StackMachine(rpn.GetRpn());
+
+            stackMachine.Run();
+            stackMachine.Print();
         }
     }
 }

@@ -11,7 +11,6 @@ namespace Interpreter
 
         public AstNode AstNode { get; private set; }
 
-
         public Parser(List<Token> tokens)
         { 
             _tokens = tokens;
@@ -21,8 +20,7 @@ namespace Interpreter
         {
             AstNode = new AstNode(NodeType.language);
 
-            //while (_tokens.Count >= _position)
-            while (_tokens.Count > _position)
+            while (_currentTokenType != TokenType.END)
             {
                 try
                 {
@@ -43,17 +41,44 @@ namespace Interpreter
 
             astTop.AddNode(astNode);
 
-            if (_currentTokenType == TokenType.VAR) 
+            if (_currentTokenType == TokenType.VAR)
             {
-                AssignExpr(astNode);
-            } 
-            else if (_currentTokenType == TokenType.WHILE) 
+                if (NextTokenType() == TokenType.DOT)
+                {
+                    FuncExpr(astNode);
+                }
+                else
+                {
+                    AssignExpr(astNode);
+                }
+            }
+            else if (_currentTokenType == TokenType.WHILE)
             {
                 WhileExpr(astNode);
             }
             else if (_currentTokenType == TokenType.IF)
             {
                 IfExpr(astNode);
+            }
+            else if (_currentTokenType == TokenType.FOR)
+            {
+                ForExpr(astNode);
+            }
+            else if (_currentTokenType == TokenType.DO)
+            {
+                DoWhileExpr(astNode);
+            }
+            else if (_currentTokenType == TokenType.PRINT)
+            {
+                PrintExpr(astNode);
+            }
+            else if (_currentTokenType == TokenType.LINKED_LIST)
+            {
+                LinkedListExpr(astNode);
+            }
+            else if (_currentTokenType == TokenType.HASH_SET)
+            {
+                HashSetExpr(astNode);
             }
             else
             {
@@ -72,6 +97,108 @@ namespace Interpreter
             Expression(astNode);
 
             astNode.AddLeaf(Check(TokenType.SEMICOLON));
+        }
+
+        private void FuncExpr(AstNode astTop)
+        {
+            AstNode astNext = new AstNode(NodeType.func_expr);
+            astTop.AddNode(astNext);
+
+            if (_currentTokenType == TokenType.VAR)
+            {
+                astNext.AddLeaf(Check(TokenType.VAR));
+                astNext.AddLeaf(Check(TokenType.DOT));
+                astNext.AddLeaf(new Token(TokenType.FUNC, Check(TokenType.VAR).Value));
+                astNext.AddLeaf(Check(TokenType.LEFT_PAREN));
+
+                if (_currentTokenType != TokenType.RIGHT_PAREN)
+                {
+                    Expression(astNext);
+
+                    while (_currentTokenType == TokenType.COMMA)
+                    {
+                        astNext.AddLeaf(Check(TokenType.COMMA));
+                        Expression(astNext);
+                    }
+                }
+                astNext.AddLeaf(Check(TokenType.RIGHT_PAREN));
+                astNext.AddLeaf(Check(TokenType.SEMICOLON));
+            }
+            else
+            {
+                throw new Exception();
+            }
+        }  
+
+        private void ForExpr(AstNode astTop)
+        {
+            AstNode astNext = new AstNode(NodeType.for_expr);
+
+            astTop.AddNode(astNext);
+
+            astNext.AddLeaf(Check(TokenType.FOR));
+            astNext.AddLeaf(Check(TokenType.LEFT_PAREN));
+            AssignExprFor(astNext);
+            astNext.AddLeaf(Check(TokenType.SEMICOLON));
+            Expression(astNext);
+            astNext.AddLeaf(Check(TokenType.SEMICOLON));
+            AssignExprFor(astNext);
+            astNext.AddLeaf(Check(TokenType.RIGHT_PAREN));
+            Block(astNext);
+        }
+
+        private void AssignExprFor(AstNode astTop)
+        {
+            AstNode astNext = new AstNode(NodeType.assign_expr);
+            astTop.AddNode(astNext);
+
+            astNext.AddLeaf(Check(TokenType.VAR));
+            astNext.AddLeaf(Check(TokenType.ASSIGN));
+            Expression(astNext);
+        }
+
+        private void DoWhileExpr(AstNode astTop)
+        {
+            AstNode astNext = new AstNode(NodeType.do_while_expr);
+            astTop.AddNode(astNext);
+
+            astNext.AddLeaf(Check(TokenType.DO));
+            Block(astNext);
+            astNext.AddLeaf(Check(TokenType.WHILE));
+            astNext.AddLeaf(Check(TokenType.LEFT_PAREN));
+            Expression(astNext);
+            astNext.AddLeaf(Check(TokenType.RIGHT_PAREN));
+            astNext.AddLeaf(Check(TokenType.SEMICOLON));
+        }
+
+        private void PrintExpr(AstNode astTop)
+        {
+            AstNode astNext = new AstNode(NodeType.print_expr);
+            astTop.AddNode(astNext);
+
+            astNext.AddLeaf(Check(TokenType.PRINT));
+            Expression(astNext);
+            astNext.AddLeaf(Check(TokenType.SEMICOLON));
+        }
+
+        private void LinkedListExpr(AstNode astTop)
+        {
+            AstNode astNext = new AstNode(NodeType.lincked_list_expr);
+            astTop.AddNode(astNext);
+
+            astNext.AddLeaf(Check(TokenType.LINKED_LIST));
+            astNext.AddLeaf(Check(TokenType.VAR));
+            astNext.AddLeaf(Check(TokenType.SEMICOLON));
+        }
+
+        private void HashSetExpr(AstNode astTop)
+        {
+            AstNode astNext = new AstNode(NodeType.hash_set_expr);
+            astTop.AddNode(astNext);
+
+            astNext.AddLeaf(Check(TokenType.HASH_SET));
+            astNext.AddLeaf(Check(TokenType.VAR));
+            astNext.AddLeaf(Check(TokenType.SEMICOLON));
         }
 
         private void IfExpr(AstNode astTop)
@@ -174,7 +301,14 @@ namespace Interpreter
         
             if (_currentTokenType == TokenType.NUMBER || _currentTokenType == TokenType.VAR)
             {
-                Member(astNode);
+                if (_currentTokenType == TokenType.VAR && NextTokenType() == TokenType.DOT)
+                {
+                    MemberExpr(astNode);
+                }
+                else
+                {
+                    Member(astNode);
+                }
             }
             else if (_currentTokenType == TokenType.LEFT_PAREN)
             {      
@@ -198,9 +332,13 @@ namespace Interpreter
             astTop.AddNode(astNode);
 
             if (IsOperator(_currentTokenType))
+            {
                 astNode.AddLeaf(GetNextToken());
+            }
             else
+            {
                 throw new Exception();
+            }
         }
 
         private void BracketMember(AstNode astTop)
@@ -217,11 +355,44 @@ namespace Interpreter
         {
             AstNode astNode = new AstNode(NodeType.member);
             astTop.AddNode(astNode);
-        
+
             if (_currentTokenType == TokenType.NUMBER || _currentTokenType == TokenType.VAR)
+            {
                 astNode.AddLeaf(GetNextToken());
+            }
             else
                 throw new Exception();
+        }
+
+        private void MemberExpr(AstNode astTop) 
+        {
+            AstNode astNext = new AstNode(NodeType.member_expr);
+            astTop.AddNode(astNext);
+
+            if (_currentTokenType == TokenType.VAR)
+            {
+                astNext.AddLeaf(Check(TokenType.VAR));
+                astNext.AddLeaf(Check(TokenType.DOT));
+                astNext.AddLeaf(new Token(TokenType.FUNC, Check(TokenType.VAR).Value));
+                astNext.AddLeaf(Check(TokenType.LEFT_PAREN));
+
+                if (_currentTokenType != TokenType.RIGHT_PAREN)
+                {
+                    Expression(astNext);
+
+                    while (_currentTokenType == TokenType.COMMA)
+                    {
+                        astNext.AddLeaf(Check(TokenType.COMMA));
+                        Expression(astNext);
+                    }
+                }
+
+                astNext.AddLeaf(Check(TokenType.RIGHT_PAREN));
+            }
+            else 
+            {
+                throw new Exception();
+            }
         }
 
         private Token Check(TokenType tokenType)
@@ -231,12 +402,7 @@ namespace Interpreter
                 throw new Exception("Unexpected: " + tokenType + " currentTokenType " + _currentTokenType);
             }
 
-            //_tokens.RemoveAt(0);
             return _tokens[_position++];
-            //if (_currentTokenType != tokenType)
-            //    throw new Exception();
-            //else
-            //    return _tokens[_position++];
         }
         
         private Token GetNextToken()
@@ -244,14 +410,9 @@ namespace Interpreter
             return _tokens[_position++];
         }
 
-        private void Match(TokenType tokenType)
+        private TokenType NextTokenType()
         {
-            if (_currentTokenType != tokenType)
-            {
-                throw new Exception("Unexpected: " + tokenType + " currentTokenType " + _currentTokenType);
-            }
-
-            _tokens.RemoveAt(0);
+            return _tokens[_position + 1].TokenType;
         }
 
         private TokenType Peek()
