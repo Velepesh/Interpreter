@@ -20,7 +20,7 @@ namespace Interpreter
         {
             AstNode = new AstNode(NodeType.language);
 
-            while (_currentTokenType != TokenType.END)
+            while (_tokens.Count > _position)
             {
                 try
                 {

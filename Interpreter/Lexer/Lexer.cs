@@ -40,10 +40,6 @@ namespace Interpreter
             new Terminal(TokenType.RIGTH_BRACE, "^\\}$"),
             new Terminal(TokenType.COMMA, "^,$"),
             new Terminal(TokenType.DOT, "^.$"),
-            //new Terminal("VAR_TYPE", "^int|str|float$", 1),
-            //new Terminal("OP", "^[+-/*]|\\+\\+|\\-\\-$"),
-
-           
         };
 
         private List<Token> _tokens = new List<Token>();
@@ -65,8 +61,6 @@ namespace Interpreter
             }
 
             Print(_tokens);
-
-            _tokens.Add(new Token(TokenType.END, ""));
         }
 
         public List<Token> GetTokens()
