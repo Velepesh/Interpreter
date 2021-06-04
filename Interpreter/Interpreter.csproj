@@ -43,19 +43,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AstNode.cs" />
-    <Compile Include="Element.cs" />
-    <Compile Include="Lexer.cs" />
-    <Compile Include="MyHashSet.cs" />
-    <Compile Include="MyLinkedList.cs" />
-    <Compile Include="NodeType.cs" />
+    <Compile Include="AST\AstNode.cs" />
+    <Compile Include="Collections\Element.cs" />
+    <Compile Include="Lexer\Lexer.cs" />
+    <Compile Include="Collections\MyHashSet.cs" />
+    <Compile Include="Collections\MyLinkedList.cs" />
+    <Compile Include="AST\NodeType.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StackMachine.cs" />
-    <Compile Include="Terminal.cs" />
-    <Compile Include="Token.cs" />
-    <Compile Include="TokenType.cs" />
+    <Compile Include="Lexer\Terminal.cs" />
+    <Compile Include="Lexer\Token.cs" />
+    <Compile Include="Lexer\TokenType.cs" />
     <Compile Include="Rpn.cs" />
   </ItemGroup>
   <ItemGroup>
