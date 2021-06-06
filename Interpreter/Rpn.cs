@@ -65,19 +65,28 @@ namespace Interpreter
                     throw new Exception();
             }
         }
+        private void AssignExpr(AstNode nodeConst)
+        {
+            AddOprand(nodeConst.GetLeafs()[0]);
+            AddOperator(nodeConst.GetLeafs()[1]);
+            Value(nodeConst.GetNodes()[0]);
+            FlushTexas();
+
+            _variables.Add(nodeConst.GetLeafs()[0].Value);
+        }
 
         private void WhileExpr(AstNode nodeConst)
         {
             int start = _rpn.Count;
 
-            Expression(nodeConst.GetNodes()[0]);
+            Value(nodeConst.GetNodes()[0]);
             FlushTexas();
 
             Token point = new Token(TokenType.JMP_VALUE);
             AddOprand(point);
 
             AddOprand(nodeConst.GetLeafs()[0]);
-            Block(nodeConst.GetNodes()[1]);
+            Body(nodeConst.GetNodes()[1]);
 
             Token endPoint = new Token(TokenType.JMP_VALUE);
             AddOprand(endPoint);
@@ -89,14 +98,14 @@ namespace Interpreter
 
         private void IfExpr(AstNode node)
         {
-            Expression(node.GetNodes()[0]);
+            Value(node.GetNodes()[0]);
             FlushTexas();
 
             Token point = new Token(TokenType.JMP_VALUE);
             AddOprand(point);
 
             AddOprand(node.GetLeafs()[0]);
-            Block(node.GetNodes()[1]);
+            Body(node.GetNodes()[1]);
 
             Token endPoint = new Token(TokenType.JMP_VALUE);
             AddOprand(endPoint);
@@ -121,14 +130,14 @@ namespace Interpreter
 
         private void ElifExpr(AstNode nodeConst, Token endPoint)
         {
-            Expression(nodeConst.GetNodes()[0]);
+            Value(nodeConst.GetNodes()[0]);
             FlushTexas();
 
             Token point = new Token(TokenType.JMP_VALUE);
             AddOprand(point);
 
             AddOprand(nodeConst.GetLeafs()[0]);
-            Block(nodeConst.GetNodes()[1]);
+            Body(nodeConst.GetNodes()[1]);
 
             AddOprand(endPoint);
             AddOprand(new Token(TokenType.JMP));
@@ -138,16 +147,16 @@ namespace Interpreter
 
         private void ElseExpr(AstNode nodeConst)
         {
-            Block(nodeConst.GetNodes()[0]);
+            Body(nodeConst.GetNodes()[0]);
         }
 
         private void DoWhileExpr(AstNode nodeConst)
         {
             int start = _rpn.Count;
 
-            Block(nodeConst.GetNodes()[0]);
+            Body(nodeConst.GetNodes()[0]);
 
-            Expression(nodeConst.GetNodes()[1]);
+            Value(nodeConst.GetNodes()[1]);
             FlushTexas();
 
             Token point = new Token(TokenType.JMP_VALUE);
@@ -164,14 +173,14 @@ namespace Interpreter
 
             int start = _rpn.Count;
 
-            Expression(nodeConst.GetNodes()[1]);
+            Value(nodeConst.GetNodes()[1]);
             FlushTexas();
 
             Token point = new Token(TokenType.JMP_VALUE);
             AddOprand(point);
             AddOprand(nodeConst.GetLeafs()[0]);
 
-            Block(nodeConst.GetNodes()[3]);
+            Body(nodeConst.GetNodes()[3]);
             AssignExpr(nodeConst.GetNodes()[2]);
 
             Token endPoint = new Token(TokenType.JMP_VALUE);
@@ -184,7 +193,7 @@ namespace Interpreter
 
         private void PrintExpr(AstNode nodeConst)
         {
-            Expression(nodeConst.GetNodes()[0]);
+            Value(nodeConst.GetNodes()[0]);
             FlushTexas();
             AddOprand(nodeConst.GetLeafs()[0]);
         }
@@ -204,8 +213,8 @@ namespace Interpreter
                 {
                     if (node.GetNodes().Count == 2)
                     {
-                        Expression(node.GetNodes()[0]);
-                        Expression(node.GetNodes()[1]);
+                        Value(node.GetNodes()[0]);
+                        Value(node.GetNodes()[1]);
                     }
                     else
                     {
@@ -216,8 +225,8 @@ namespace Interpreter
                 {
                     if (node.GetNodes().Count == 0)
                     {
-                        Expression(node.GetNodes()[0]);
-                        Expression(node.GetNodes()[1]);
+                        //Expression(node.GetNodes()[0]);
+                        //Expression(node.GetNodes()[1]);
                     }
                     else
                     {
@@ -242,7 +251,7 @@ namespace Interpreter
                 {
                     if (node.GetNodes().Count == 1)
                     {
-                        Expression(node.GetNodes()[0]);
+                        Value(node.GetNodes()[0]);
                     }
                     else
                     {
@@ -253,7 +262,7 @@ namespace Interpreter
                 {
                     if (node.GetNodes().Count == 1)
                     {
-                        Expression(node.GetNodes()[0]);
+                        Value(node.GetNodes()[0]);
                     }
                     else
                     {
@@ -295,7 +304,7 @@ namespace Interpreter
             _variablesSet.Add(nodeConst.GetLeafs()[1].Value);
         }
 
-        private void Block(AstNode topNode)
+        private void Body(AstNode topNode)
         {
             foreach (AstNode node in topNode.GetNodes())
             {
@@ -303,17 +312,8 @@ namespace Interpreter
             }
         }
 
-        private void AssignExpr(AstNode nodeConst)
-        {
-            AddOprand(nodeConst.GetLeafs()[0]);
-            AddOperator(nodeConst.GetLeafs()[1]);
-            Expression(nodeConst.GetNodes()[0]);
-            FlushTexas();
 
-            _variables.Add(nodeConst.GetLeafs()[0].Value);
-        }
-
-        private void Expression(AstNode topNode)
+        private void Value(AstNode topNode)
         {
             List<AstNode> nextNodes = topNode.GetNodes();
 
@@ -325,19 +325,19 @@ namespace Interpreter
             {
                 BracketMember(nextNodes[0]);
             }
-            else if (nextNodes[0].Type == NodeType.member_expr)
+            else if (nextNodes[0].Type == NodeType.member_list)
             {
-                MemberExpr(nextNodes[0]);
+                ListExpr(nextNodes[0]);
             }
 
             if (nextNodes.Count > 1)
             {
                 Op(nextNodes[1]);
-                Expression(nextNodes[2]);
+                Value(nextNodes[2]);
             }
         }
 
-        private void MemberExpr(AstNode node)
+        private void ListExpr(AstNode node)
         {
             if(!_variables.Contains(node.GetLeafs()[0].Value) && 
                 (!_variablesList.Contains(node.GetLeafs()[0].Value) || !_variablesSet.Contains(node.GetLeafs()[0].Value))) {
@@ -351,7 +351,7 @@ namespace Interpreter
                 {
                     if (node.GetNodes().Count == 1)
                     {
-                        Expression(node.GetNodes()[0]);
+                        Value(node.GetNodes()[0]);
                     }
                     else
                     {
@@ -360,9 +360,9 @@ namespace Interpreter
                 }
                 else if (node.GetLeafs()[2].Value.Equals("Size"))
                 {
-                    if (node.GetNodes().Count == 1)
+                    if (node.GetNodes().Count == 0)
                     {
-                        Expression(node.GetNodes()[0]);
+                       // Expression(node.GetNodes()[0]);
                     }
                     else
                     {
@@ -373,7 +373,7 @@ namespace Interpreter
                 {
                     if (node.GetNodes().Count == 1)
                     {
-                        Expression(node.GetNodes()[0]);
+                        Value(node.GetNodes()[0]);
                     }
                     else
                     {
@@ -392,7 +392,7 @@ namespace Interpreter
 
                     if (node.GetNodes().Count == 1)
                     {
-                        Expression(node.GetNodes()[0]);
+                        Value(node.GetNodes()[0]);
                     }
                     else
                     {
@@ -412,7 +412,7 @@ namespace Interpreter
         private void BracketMember(AstNode node)
         {
             AddOperator(node.GetLeafs()[0]);
-            Expression(node.GetNodes()[0]);
+            Value(node.GetNodes()[0]);
             AddOperator(node.GetLeafs()[1]);
         }
 
@@ -426,7 +426,7 @@ namespace Interpreter
             AddOprand(node.GetLeafs()[0]);
         }
 
-        private int OpPriority(Token op)
+        private int GetOpPriority(Token op)
         {
             int priority;
 
@@ -472,7 +472,7 @@ namespace Interpreter
 
             while (true)
             {
-                if (_tokens.First != null && OpPriority(_tokens.First.Value) > OpPriority(token))
+                if (_tokens.First != null && GetOpPriority(_tokens.First.Value) > GetOpPriority(token))
                 {
                     AddRpn();
                 }
@@ -493,6 +493,7 @@ namespace Interpreter
                 AddRpn();
             }
         }
+
         public void Print()
         {
             Console.WriteLine("Rpn: ");
@@ -502,7 +503,7 @@ namespace Interpreter
 
             foreach (Token token in _rpn)
             {
-                Console.Write($"{i++, -4}");
+                Console.Write($"{i++,-4}");
                 token.Println();
             }
 

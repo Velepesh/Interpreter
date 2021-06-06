@@ -25,9 +25,10 @@ namespace Interpreter
             }
         }
 
-        private bool NeedRehash()
+        private bool IsRehash()
         {
             int amount = 0;
+
             foreach (MyLinkedList list in _lists)
             {
                 if (list != null && list.Size() >= 2)
@@ -35,13 +36,15 @@ namespace Interpreter
                     amount++;
                 }
             }
-            return amount / _numberOfCell >= 0.75;
+
+            return amount / _numberOfCell >= 0.75f;
         }
 
         private void Rehash()
         {
             int newCount = _numberOfCell * 2;
             MyLinkedList[] newContent = new MyLinkedList[newCount];
+
             foreach (MyLinkedList list in _lists)
             {
                 if (list != null)
@@ -50,14 +53,17 @@ namespace Interpreter
                     {
                         object element = list.Get(i);
                         int newIndex = element.GetHashCode() % newCount;
+
                         if (newContent[newIndex] == null)
                         {
                             newContent[newIndex] = new MyLinkedList();
                         }
+
                         newContent[newIndex].AddFirst(element);
                     }
                 }
             }
+
             _lists = newContent;
             _numberOfCell = newCount;
         }
@@ -69,7 +75,7 @@ namespace Interpreter
 
         public void Add(object value)
         {
-            if (NeedRehash())
+            if (IsRehash())
             {
                 Rehash();
             }
@@ -110,7 +116,7 @@ namespace Interpreter
         public string PrintSet()
         {
             string str = "{";
-
+            
             foreach (MyLinkedList list in _lists)
             {
                 if (list != null)

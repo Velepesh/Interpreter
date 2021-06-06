@@ -9,7 +9,7 @@ namespace Interpreter
        {
             string expression = "";
 
-            string path = @"..\..\Exemple.txt";
+            string path = @"..\..\Example.txt";
 
             try
             {
@@ -24,16 +24,12 @@ namespace Interpreter
             }
 
             Lexer lexer = new Lexer();
-
             lexer.RunLexer(expression);
             
             Parser parser = new Parser(lexer.GetTokens());
-
-            parser.Analysis();
-            parser.AstNode.Print();
+            parser.Parse();
 
             Rpn rpn = new Rpn(parser.AstNode);
-
             rpn.Translate();
             rpn.Print();
 

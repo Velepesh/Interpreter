@@ -1,5 +1,10 @@
-﻿a = 5;
+﻿a =5;
 b = 4;
+
+for(i = 0; i < 7; i = i + 1)
+{
+	b = b + i;
+}
 
 LinkedList linkedList;
 HashSet hashSet;
@@ -29,7 +34,6 @@ hashSet.PrintSet();
 
 linkedList.PrintList();
 
+
 Print a;
 Print b;
-c = a + b + d;
-Print c;

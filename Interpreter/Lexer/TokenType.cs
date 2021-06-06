@@ -41,12 +41,11 @@
     HASH_SET,
     VAR, 
     WHILE, 
-    END,
-    FOR,
     DO,
+    FOR,
     FUNC,
+    BOOLEAN,
 
     JMP_VALUE,
     JMP,
-    BOOLEAN,
 }

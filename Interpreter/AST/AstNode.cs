@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Interpreter
 {
@@ -35,12 +32,6 @@ namespace Interpreter
             _nodes.Add(node);
         }
 
-        public void Print()
-        {
-            Console.WriteLine("\nAST\n");
-            PrintNext("", "", "", true);
-        }
-
         public List<AstNode> GetNodes()
         {
             return _nodes;
@@ -51,9 +42,15 @@ namespace Interpreter
             return _leafs;
         }
 
-        private void PrintNext(string format, string format2, string format3, bool last)
+        public void ShowAstTree()
         {
-            if (last)
+            Console.WriteLine("\nAST\n");
+            PrintNext("", "", "", true);
+        }
+
+        private void PrintNext(string format, string format2, string format3, bool isLast)
+        {
+            if (isLast)
                 Console.Write(format2);
             else
                 Console.Write(format3);
@@ -62,7 +59,7 @@ namespace Interpreter
 
             for (int i = 0; i < _leafs.Count; i++)
             {
-                if (i == _leafs.Count - 1 && this._nodes.Count == 0)
+                if (i == _leafs.Count - 1 && _nodes.Count == 0)
                 {
                     Console.Write(format + "└──");
                     Console.WriteLine(_leafs[i].TokenType + (_leafs[i].Value == null ? "" : (" (" + _leafs[i].Value + ")")));

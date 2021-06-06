@@ -60,7 +60,7 @@ namespace Interpreter
                 input.Remove(0, token.Value.Length);
             }
 
-            Print(_tokens);
+            ShowTokens(_tokens);
         }
 
         public List<Token> GetTokens()
@@ -128,7 +128,7 @@ namespace Interpreter
             return terminals;
         }
 
-        private void Print(List<Token> tokens)
+        private void ShowTokens(List<Token> tokens)
         {
             foreach (Token token in tokens)
             {

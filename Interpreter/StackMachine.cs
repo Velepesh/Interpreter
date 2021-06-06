@@ -10,8 +10,8 @@ namespace Interpreter
     {
         private List<Token> _rpn = new List<Token>();
         private Dictionary<string, int> _variables = new Dictionary<string, int>();
-        private Dictionary<string, MyLinkedList> _variablesLinkedList = new Dictionary<string, MyLinkedList>();
-        private Dictionary<string, MyHashSet> _variablesHashSet = new Dictionary<string, MyHashSet>();
+        private Dictionary<string, MyLinkedList> _linkedListVariables = new Dictionary<string, MyLinkedList>();
+        private Dictionary<string, MyHashSet> _hashSetVariables = new Dictionary<string, MyHashSet>();
         private LinkedList<Token> _stack = new LinkedList<Token>();
         private int _index;
 
@@ -27,67 +27,67 @@ namespace Interpreter
                 switch (_rpn[_index].TokenType)
                 {
                     case TokenType.PLUS:
-                        _stack.AddFirst(Sum(RemoveFromStack(), RemoveFromStack()));
+                        _stack.AddFirst(Sum(GetFirstFromStack(), GetFirstFromStack()));
                         break;
                     case TokenType.MINUS:
-                        _stack.AddFirst(Sub(RemoveFromStack(), RemoveFromStack()));
+                        _stack.AddFirst(Sub(GetFirstFromStack(), GetFirstFromStack()));
                         break;
                     case TokenType.MULT:
-                        _stack.AddFirst(Mult(RemoveFromStack(), RemoveFromStack()));
+                        _stack.AddFirst(Mult(GetFirstFromStack(), GetFirstFromStack()));
                         break;
                     case TokenType.DIV:
-                        _stack.AddFirst(Div(RemoveFromStack(), RemoveFromStack()));
+                        _stack.AddFirst(Div(GetFirstFromStack(), GetFirstFromStack()));
                         break;
                     case TokenType.ASSIGN:
-                        Assign(RemoveFromStack(), RemoveFromStack());
+                        Assign(GetFirstFromStack(), GetFirstFromStack());
                         break;
                     case TokenType.EQUAL:
-                        _stack.AddFirst(Equal(RemoveFromStack(), RemoveFromStack()));
+                        _stack.AddFirst(Equal(GetFirstFromStack(), GetFirstFromStack()));
                         break;
                     case TokenType.NOT_EQUAL:
-                        _stack.AddFirst(NotEqual(RemoveFromStack(), RemoveFromStack()));
+                        _stack.AddFirst(NotEqual(GetFirstFromStack(), GetFirstFromStack()));
                         break;
                     case TokenType.GREATER:
-                        _stack.AddFirst(Greater(RemoveFromStack(), RemoveFromStack()));
+                        _stack.AddFirst(Greater(GetFirstFromStack(), GetFirstFromStack()));
                         break;
                     case TokenType.LESS:
-                        _stack.AddFirst(Less(RemoveFromStack(), RemoveFromStack()));
+                        _stack.AddFirst(Less(GetFirstFromStack(), GetFirstFromStack()));
                         break;
                     case TokenType.GREATER_EQUAL:
-                        _stack.AddFirst(GreaterEqual(RemoveFromStack(), RemoveFromStack()));
+                        _stack.AddFirst(GreaterEqual(GetFirstFromStack(), GetFirstFromStack()));
                         break;
                     case TokenType.LESS_EQUAL:
-                        _stack.AddFirst(LessEqual(RemoveFromStack(), RemoveFromStack()));
+                        _stack.AddFirst(LessEqual(GetFirstFromStack(), GetFirstFromStack()));
                         break;
                     case TokenType.IF:
-                        IfExpr(RemoveFromStack(), RemoveFromStack());
+                        SetTransitionIndex(GetFirstFromStack(), GetFirstFromStack());
                         break;
                     case TokenType.ELIF:
-                        IfExpr(RemoveFromStack(), RemoveFromStack());
+                        SetTransitionIndex(GetFirstFromStack(), GetFirstFromStack());
                         break;
                     case TokenType.WHILE:
-                        WhileExpr(RemoveFromStack(), RemoveFromStack());
+                        SetTransitionIndex(GetFirstFromStack(), GetFirstFromStack());
                         break;
                     case TokenType.DO:
-                        DoWhileExpr(RemoveFromStack(), RemoveFromStack());
+                        SetTransitionIndex(GetFirstFromStack(), GetFirstFromStack());
                         break;
                     case TokenType.FOR:
-                        ForExpr(RemoveFromStack(), RemoveFromStack());
+                        SetTransitionIndex(GetFirstFromStack(), GetFirstFromStack());
                         break;
                     case TokenType.FUNC:
                         FuncExpr(_rpn[_index]);
                         break;
                     case TokenType.PRINT:
-                        PrintExpr(RemoveFromStack());
+                        PrintExpr(GetFirstFromStack());
                         break;
                     case TokenType.LINKED_LIST:
-                        LinkedListExpr(RemoveFromStack());
+                        LinkedListExpr(GetFirstFromStack());
                         break;
                     case TokenType.HASH_SET:
-                        HashSetExpr(RemoveFromStack());
+                        HashSetExpr(GetFirstFromStack());
                         break;
                     case TokenType.JMP:
-                        _index = Convert.ToInt32(RemoveFromStack().Value) - 1;
+                        _index = Convert.ToInt32(GetFirstFromStack().Value) - 1;
                         break;
                     default:
                         _stack.AddFirst(_rpn[_index]);
@@ -96,126 +96,103 @@ namespace Interpreter
             }
         }
 
-        private Token RemoveFromStack()
+        private Token GetFirstFromStack()
         {
             var token = _stack.First.Value;
-            _stack.RemoveFirst();
+            RemoveFirstFromStack();
 
             return token;
         }
-
-        private void WhileExpr(Token jmp, Token boolean)
+        private void RemoveFirstFromStack()
         {
-            int jmpValue = Convert.ToInt32(jmp.Value);
-            bool boolValue = Convert.ToBoolean(boolean.Value);
-
-            if (!boolValue)
-                _index = jmpValue - 1;
+            _stack.RemoveFirst();
         }
 
-        private void IfExpr(Token jmp, Token boolean)
+        private void SetTransitionIndex(Token jump, Token condition)
         {
-            int jmpValue = Convert.ToInt32(jmp.Value);
-            bool boolValue = Convert.ToBoolean(boolean.Value);
+            int jumpValue = Convert.ToInt32(jump.Value);
+            bool conditionValue = Convert.ToBoolean(condition.Value);
 
-            if (!boolValue)
-                _index = jmpValue - 1;
-        }
-
-        private void DoWhileExpr(Token jmp, Token boolean)
-        {
-            int jmpValue = Convert.ToInt32(jmp.Value);
-            bool boolValue = Convert.ToBoolean(boolean.Value);
-
-        if (boolValue)
-            _index = jmpValue - 1;
-        }
-
-        private void ForExpr(Token jmp, Token boolean)
-        {
-            int jmpValue = Convert.ToInt32(jmp.Value);
-            bool boolValue = Convert.ToBoolean(boolean.Value);
-
-            if (!boolValue)
-                _index = jmpValue - 1;
+            if (conditionValue == false)
+                _index = jumpValue - 1;
         }
 
         private void FuncExpr(Token token)
         {
-            Token name = RemoveFromStack();
+            Token name = GetFirstFromStack();
 
-            if (_variablesLinkedList.ContainsKey(name.Value))
+            if (_linkedListVariables.ContainsKey(name.Value))
             {
                 if (token.Value.Equals("Add"))
                 {
-                    Token valueFromStack = RemoveFromStack();
-                    Token index = RemoveFromStack();
+                    Token valueFromStack = GetFirstFromStack();
+                    Token index = GetFirstFromStack();
 
                     int indexValue = index.TokenType == TokenType.VAR ? _variables[index.Value] : Convert.ToInt32(index.Value);
                     int value = valueFromStack.TokenType == TokenType.VAR ? _variables[valueFromStack.Value] : Convert.ToInt32(valueFromStack.Value);
 
-                    _variablesLinkedList[name.Value].Add(indexValue, value);
+                    _linkedListVariables[name.Value].Add(indexValue, value);
                 }
                 else if (token.Value.Equals("Size"))
                 {
-                    Token index = RemoveFromStack();
+                    Token index = GetFirstFromStack();
 
                     int indexValue = index.TokenType == TokenType.VAR ? _variables[index.Value] : Convert.ToInt32(index.Value);
 
-                    _stack.AddFirst(new Token(TokenType.NUMBER, _variablesLinkedList[name.Value].Peek(indexValue)));
+                    _stack.AddFirst(new Token(TokenType.NUMBER, _linkedListVariables[name.Value].Size()));
                 }
                 else if (token.Value.Equals("Get"))
                 {
-                    Token index = RemoveFromStack();
+                    Token index = GetFirstFromStack();
 
                     int indexValue = index.TokenType == TokenType.VAR ? _variables[index.Value] : Convert.ToInt32(index.Value);
 
-                    _stack.AddFirst(new Token(TokenType.NUMBER, (string)_variablesLinkedList[name.Value].Get(indexValue)));
+                    _stack.AddFirst(new Token(TokenType.NUMBER, (string)_linkedListVariables[name.Value].Get(indexValue)));
                 }
                 else if (token.Value.Equals("Contains"))
                 {
-                    Token index = RemoveFromStack();
+                    Token index = GetFirstFromStack();
 
                     int value_value = index.TokenType == TokenType.VAR ? _variables[index.Value] : Convert.ToInt32(index.Value);
 
-                    _stack.AddFirst(new Token(TokenType.BOOLEAN, _variablesLinkedList[name.Value].Contains(value_value) ? Convert.ToString(false) : Convert.ToString(true)));
+                    _stack.AddFirst(new Token(TokenType.BOOLEAN, _linkedListVariables[name.Value].Contains(value_value) ? Convert.ToString(false) : Convert.ToString(true)));
                 }
                 else if (token.Value.Equals("PrintList"))
                 {
-                    _variablesLinkedList[name.Value].PrintList();
+                    _linkedListVariables[name.Value].PrintList();
                     Console.WriteLine();
                 }
             }
-            else if (_variablesHashSet.ContainsKey(name.Value))
+            else if (_hashSetVariables.ContainsKey(name.Value))
             {
                 if (token.Value.Equals("Add"))
                 {
-                    Token value = RemoveFromStack();
+                    Token value = GetFirstFromStack();
 
                     int value_value = value.TokenType == TokenType.VAR ? _variables[value.Value] : Convert.ToInt32(value.Value);
 
-                    _variablesHashSet[name.Value].Add(value_value);
+                    _hashSetVariables[name.Value].Add(value_value);
                 }
                 else if (token.Value.Equals("Contains"))
                 {
-                    Token index = RemoveFromStack();
+                    Token index = GetFirstFromStack();
 
                     int value_value = index.TokenType == TokenType.VAR ? _variables[index.Value] : Convert.ToInt32(index.Value);
 
-                    _stack.AddFirst(new Token(TokenType.BOOLEAN, _variablesHashSet[name.Value].Contains(value_value) ? Convert.ToString(false) : Convert.ToString(true)));
+                    _stack.AddFirst(new Token(TokenType.BOOLEAN, _hashSetVariables[name.Value].Contains(value_value) ? Convert.ToString(false) : Convert.ToString(true)));
                 }
                 else if (token.Value.Equals("Remove"))
                 {
-                    Token index = RemoveFromStack();
+                    Token index = GetFirstFromStack();
 
                     int value_value = index.TokenType == TokenType.VAR ? _variables[index.Value] : Convert.ToInt32(index.Value);
 
-                    _variablesHashSet[name.Value].Remove(value_value);
+                    _hashSetVariables[name.Value].Remove(value_value);
                 }
                 else if (token.Value.Equals("PrintSet"))
                 {
 
-                    _variablesHashSet[name.Value].PrintSet();
+                    _hashSetVariables[name.Value].PrintSet();
                     Console.WriteLine();
                 }
             }
@@ -224,25 +201,35 @@ namespace Interpreter
         private void PrintExpr(Token a)
         {
             int a_value = a.TokenType == TokenType.VAR ? _variables[a.Value] : Convert.ToInt32(a.Value);
-            Console.WriteLine(a_value);
+            Console.WriteLine(a_value);///////нужен ли?
         }
 
         private void LinkedListExpr(Token token)
         {
-            if ((_variablesLinkedList.ContainsKey(token.Value) || _variables.ContainsKey(token.Value)) == false)
+            if ((_linkedListVariables.ContainsKey(token.Value) || _variables.ContainsKey(token.Value)) == false)
             {
-                _variablesLinkedList.Add(token.Value, new MyLinkedList());
+                _linkedListVariables.Add(token.Value, new MyLinkedList());
             }
         }
 
         private void HashSetExpr(Token token)
         {
-            if ((_variablesLinkedList.ContainsKey(token.Value) || _variables.ContainsKey(token.Value)) == false)
+            if ((_linkedListVariables.ContainsKey(token.Value) || _variables.ContainsKey(token.Value)) == false)
             {
-                _variablesHashSet.Add(token.Value, new MyHashSet());
+                _hashSetVariables.Add(token.Value, new MyHashSet());
             }
         }
 
+        private void Assign(Token a, Token b)
+        {
+            string key = b.Value;
+            int value = Convert.ToInt32(a.Value);
+
+            if (_variables.ContainsKey(key))
+                _variables[key] = value;
+            else
+                _variables.Add(key, value);
+        }
         private Token NotEqual(Token a, Token b)
         {
             int a_value = a.TokenType == TokenType.VAR ? _variables[a.Value] : Convert.ToInt32(a.Value);
@@ -321,11 +308,6 @@ namespace Interpreter
             int b_value = b.TokenType == TokenType.VAR ? _variables[b.Value] : Convert.ToInt32(b.Value);
 
             return new Token(TokenType.NUMBER, Convert.ToString(b_value - a_value));
-        }
-
-        private void Assign(Token a, Token b)
-        {
-            _variables.Add(b.Value, Convert.ToInt32(a.Value));
         }
 
         public void Print()
