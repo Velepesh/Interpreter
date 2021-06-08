@@ -43,7 +43,7 @@
     WHILE, 
     DO,
     FOR,
-    FUNC,
+    METHOD,
     BOOLEAN,
 
     JMP_VALUE,

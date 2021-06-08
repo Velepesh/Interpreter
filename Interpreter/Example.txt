@@ -7,6 +7,7 @@ for(i = 0; i < 7; i = i + 1)
 }
 
 LinkedList linkedList;
+LinkedList g;
 HashSet hashSet;
 
 linkedList.Add(0, 1);

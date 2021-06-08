@@ -45,9 +45,9 @@ namespace Interpreter
 
             if (_currentTokenType == TokenType.VAR)
             {
-                if (NextTokenType() == TokenType.DOT)
+                if (GetNextTokenType() == TokenType.DOT)
                 {
-                    ParseFuncExpr(node);
+                    ParseMethodExpr(node);
                 }
                 else
                 {
@@ -100,38 +100,6 @@ namespace Interpreter
 
             node.AddLeaf(Check(TokenType.SEMICOLON));
         }
-
-        private void ParseFuncExpr(AstNode astTop)
-        {
-            AstNode node = new AstNode(NodeType.func_expr);
-            astTop.AddNode(node);
-
-            if (_currentTokenType == TokenType.VAR)
-            {
-                node.AddLeaf(Check(TokenType.VAR));
-                node.AddLeaf(Check(TokenType.DOT));
-                node.AddLeaf(new Token(TokenType.FUNC, Check(TokenType.VAR).Value));
-                node.AddLeaf(Check(TokenType.LEFT_PAREN));
-
-                if (_currentTokenType != TokenType.RIGHT_PAREN)
-                {
-                    ParseValue(node);
-
-                    while (_currentTokenType == TokenType.COMMA)
-                    {
-                        node.AddLeaf(Check(TokenType.COMMA));
-                        ParseValue(node);
-                    }
-                }
-
-                node.AddLeaf(Check(TokenType.RIGHT_PAREN));
-                node.AddLeaf(Check(TokenType.SEMICOLON));
-            }
-            else
-            {
-                throw new Exception("Unexpected token type:" + _currentTokenType);
-            }
-        }  
 
         private void ParseForExpr(AstNode astTop)
         {
@@ -292,13 +260,13 @@ namespace Interpreter
 
         private void ParseValue(AstNode astTop)
         {
-            AstNode node = new AstNode(NodeType.expression);
+            AstNode node = new AstNode(NodeType.value);
             astTop.AddNode(node);
         
             if (_currentTokenType == TokenType.NUMBER || _currentTokenType == TokenType.VAR)
             {
-                if (_currentTokenType == TokenType.VAR && NextTokenType() == TokenType.DOT)
-                    ParseListExpr(node);
+                if (_currentTokenType == TokenType.VAR && GetNextTokenType() == TokenType.DOT)
+                    ParseMethodExpr(node);
                 else
                     ParseMember(node);
             }
@@ -343,16 +311,16 @@ namespace Interpreter
             node.AddLeaf(Check(TokenType.RIGHT_PAREN));
         }
 
-        private void ParseListExpr(AstNode astTop) 
+        private void ParseMethodExpr(AstNode astTop) 
         {
-            AstNode node = new AstNode(NodeType.member_list);
+            AstNode node = new AstNode(NodeType.method);
             astTop.AddNode(node);
 
             if (_currentTokenType == TokenType.VAR)
             {
                 node.AddLeaf(Check(TokenType.VAR));
                 node.AddLeaf(Check(TokenType.DOT));
-                node.AddLeaf(new Token(TokenType.FUNC, Check(TokenType.VAR).Value));
+                node.AddLeaf(new Token(TokenType.METHOD, Check(TokenType.VAR).Value));
                 node.AddLeaf(Check(TokenType.LEFT_PAREN));
 
                 if (_currentTokenType != TokenType.RIGHT_PAREN)
@@ -367,6 +335,11 @@ namespace Interpreter
                 }
 
                 node.AddLeaf(Check(TokenType.RIGHT_PAREN));
+
+                if(_currentTokenType == TokenType.SEMICOLON)
+                {
+                    node.AddLeaf(Check(TokenType.SEMICOLON));
+                }
             }
             else 
             {
@@ -394,7 +367,7 @@ namespace Interpreter
             return _tokens[_position++];
         }
 
-        private TokenType NextTokenType()
+        private TokenType GetNextTokenType()
         {
             return _tokens[_position + 1].TokenType;
         }

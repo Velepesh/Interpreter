@@ -11,9 +11,8 @@ namespace Interpreter
         private AstNode _astNode;
         private LinkedList<Token> _tokens = new LinkedList<Token>();
         private List<Token> _rpn = new List<Token>();
-        private HashSet<string> _variables = new HashSet<string>();
-        private HashSet<string> _variablesList = new HashSet<string>();
-        private HashSet<string> _variablesSet = new HashSet<string>();
+        private HashSet<string> _linkedListVariables = new HashSet<string>();
+        private HashSet<string> _hashSetVariables = new HashSet<string>();
 
         public Rpn(AstNode astNode)
         {
@@ -49,8 +48,8 @@ namespace Interpreter
                 case NodeType.for_expr:
                     ForExpr(nodeExpr);
                     break;
-                case NodeType.func_expr:
-                    FuncExpr(nodeExpr);
+                case NodeType.method:
+                    MethodExpr(nodeExpr);
                     break;
                 case NodeType.print_expr:
                     PrintExpr(nodeExpr);
@@ -65,28 +64,26 @@ namespace Interpreter
                     throw new Exception();
             }
         }
-        private void AssignExpr(AstNode nodeConst)
+        private void AssignExpr(AstNode node)
         {
-            AddOprand(nodeConst.GetLeafs()[0]);
-            AddOperator(nodeConst.GetLeafs()[1]);
-            Value(nodeConst.GetNodes()[0]);
+            AddOprand(node.GetLeafs()[0]);
+            AddOperator(node.GetLeafs()[1]);
+            Value(node.GetNodes()[0]);
             FlushTexas();
-
-            _variables.Add(nodeConst.GetLeafs()[0].Value);
         }
 
-        private void WhileExpr(AstNode nodeConst)
+        private void WhileExpr(AstNode node)
         {
             int start = _rpn.Count;
 
-            Value(nodeConst.GetNodes()[0]);
+            Value(node.GetNodes()[0]);
             FlushTexas();
 
             Token point = new Token(TokenType.JMP_VALUE);
             AddOprand(point);
 
-            AddOprand(nodeConst.GetLeafs()[0]);
-            Body(nodeConst.GetNodes()[1]);
+            AddOprand(node.GetLeafs()[0]);
+            Body(node.GetNodes()[1]);
 
             Token endPoint = new Token(TokenType.JMP_VALUE);
             AddOprand(endPoint);
@@ -128,16 +125,16 @@ namespace Interpreter
             endPoint.SetValue(Convert.ToString(_rpn.Count));
         }
 
-        private void ElifExpr(AstNode nodeConst, Token endPoint)
+        private void ElifExpr(AstNode node, Token endPoint)
         {
-            Value(nodeConst.GetNodes()[0]);
+            Value(node.GetNodes()[0]);
             FlushTexas();
 
             Token point = new Token(TokenType.JMP_VALUE);
             AddOprand(point);
 
-            AddOprand(nodeConst.GetLeafs()[0]);
-            Body(nodeConst.GetNodes()[1]);
+            AddOprand(node.GetLeafs()[0]);
+            Body(node.GetNodes()[1]);
 
             AddOprand(endPoint);
             AddOprand(new Token(TokenType.JMP));
@@ -145,43 +142,43 @@ namespace Interpreter
             point.SetValue(Convert.ToString(_rpn.Count));
         }
 
-        private void ElseExpr(AstNode nodeConst)
+        private void ElseExpr(AstNode node)
         {
-            Body(nodeConst.GetNodes()[0]);
+            Body(node.GetNodes()[0]);
         }
 
-        private void DoWhileExpr(AstNode nodeConst)
+        private void DoWhileExpr(AstNode node)
         {
             int start = _rpn.Count;
 
-            Body(nodeConst.GetNodes()[0]);
+            Body(node.GetNodes()[0]);
 
-            Value(nodeConst.GetNodes()[1]);
+            Value(node.GetNodes()[1]);
             FlushTexas();
 
             Token point = new Token(TokenType.JMP_VALUE);
             AddOprand(point);
 
-            AddOprand(nodeConst.GetLeafs()[0]);
+            AddOprand(node.GetLeafs()[0]);
 
             point.SetValue(Convert.ToString(start));
         }
 
-        private void ForExpr(AstNode nodeConst)
+        private void ForExpr(AstNode node)
         {
-            AssignExpr(nodeConst.GetNodes()[0]);
+            AssignExpr(node.GetNodes()[0]);
 
             int start = _rpn.Count;
 
-            Value(nodeConst.GetNodes()[1]);
+            Value(node.GetNodes()[1]);
             FlushTexas();
 
             Token point = new Token(TokenType.JMP_VALUE);
             AddOprand(point);
-            AddOprand(nodeConst.GetLeafs()[0]);
+            AddOprand(node.GetLeafs()[0]);
 
-            Body(nodeConst.GetNodes()[3]);
-            AssignExpr(nodeConst.GetNodes()[2]);
+            Body(node.GetNodes()[3]);
+            AssignExpr(node.GetNodes()[2]);
 
             Token endPoint = new Token(TokenType.JMP_VALUE);
             AddOprand(endPoint);
@@ -191,117 +188,42 @@ namespace Interpreter
             endPoint.SetValue(Convert.ToString(start));
         }
 
-        private void PrintExpr(AstNode nodeConst)
+        private void PrintExpr(AstNode node)
         {
-            Value(nodeConst.GetNodes()[0]);
+            Value(node.GetNodes()[0]);
             FlushTexas();
-            AddOprand(nodeConst.GetLeafs()[0]);
+            AddOprand(node.GetLeafs()[0]);
         }
 
-        private void FuncExpr(AstNode node)
+        private void MethodExpr(AstNode node)
         {
-            if (!_variables.Contains(node.GetLeafs()[0].Value) 
-                && (!_variablesList.Contains(node.GetLeafs()[0].Value) 
-                || !_variablesSet.Contains(node.GetLeafs()[0].Value)))
-            {
-                throw new Exception();
-            }
+            var value = node.GetLeafs()[0].Value;
 
-            if (_variablesList.Contains(node.GetLeafs()[0].Value))
-            {
-                if (node.GetLeafs()[2].Value.Equals("Add"))
-                {
-                    if (node.GetNodes().Count == 2)
-                    {
-                        Value(node.GetNodes()[0]);
-                        Value(node.GetNodes()[1]);
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
-                }
-                else if (node.GetLeafs()[2].Value.Equals("Size"))
-                {
-                    if (node.GetNodes().Count == 0)
-                    {
-                        //Expression(node.GetNodes()[0]);
-                        //Expression(node.GetNodes()[1]);
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
-                }
-                else if (node.GetLeafs()[2].Value.Equals("PrintList"))
-                {
-                    if (node.GetNodes().Count != 0)
-                    {
-                        throw new Exception();
-                    }
-                }
-                else
-                {
-                    throw new Exception();
-                }
-            }
-            else if (_variablesSet.Contains(node.GetLeafs()[0].Value))
-            {
-                if (node.GetLeafs()[2].Value.Equals("Add"))
-                {
-                    if (node.GetNodes().Count == 1)
-                    {
-                        Value(node.GetNodes()[0]);
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
-                }
-                else if (node.GetLeafs()[2].Value.Equals("Remove"))
-                {
-                    if (node.GetNodes().Count == 1)
-                    {
-                        Value(node.GetNodes()[0]);
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
-                }
-                else if (node.GetLeafs()[2].Value.Equals("PrintSet"))
-                {
-                    if (node.GetNodes().Count != 0)
-                    {
-                        throw new Exception();
-                    }
-                }
-                else
-                {
-                    throw new Exception();
-                }
-            }
+            if (_linkedListVariables.Contains(value))
+                CallLinkedListMethod(node);
+            else if (_hashSetVariables.Contains(value))
+                CallHashSetMethod(node);
+            else
+                throw new Exception($"Name {value} does not exist in current context");
 
             AddOprand(node.GetLeafs()[0]);
             AddOprand(node.GetLeafs()[2]);
         }
 
-        private void LinkedListExpr(AstNode nodeConst)
+        private void LinkedListExpr(AstNode node)
         {
-            AddOprand(nodeConst.GetLeafs()[1]);
-            AddOprand(nodeConst.GetLeafs()[0]);
+            AddOprand(node.GetLeafs()[1]);
+            AddOprand(node.GetLeafs()[0]);
 
-            _variables.Add(nodeConst.GetLeafs()[1].Value);
-            _variablesList.Add(nodeConst.GetLeafs()[1].Value);
+            _linkedListVariables.Add(node.GetLeafs()[1].Value);
         }
 
-        private void HashSetExpr(AstNode nodeConst)
+        private void HashSetExpr(AstNode node)
         {
-            AddOprand(nodeConst.GetLeafs()[1]);
-            AddOprand(nodeConst.GetLeafs()[0]);
+            AddOprand(node.GetLeafs()[1]);
+            AddOprand(node.GetLeafs()[0]);
 
-            _variables.Add(nodeConst.GetLeafs()[1].Value);
-            _variablesSet.Add(nodeConst.GetLeafs()[1].Value);
+            _hashSetVariables.Add(node.GetLeafs()[1].Value);
         }
 
         private void Body(AstNode topNode)
@@ -311,7 +233,6 @@ namespace Interpreter
                 Language(node);
             }
         }
-
 
         private void Value(AstNode topNode)
         {
@@ -325,9 +246,9 @@ namespace Interpreter
             {
                 BracketMember(nextNodes[0]);
             }
-            else if (nextNodes[0].Type == NodeType.member_list)
+            else if (nextNodes[0].Type == NodeType.method)
             {
-                ListExpr(nextNodes[0]);
+                MethodExpr(nextNodes[0]);
             }
 
             if (nextNodes.Count > 1)
@@ -337,76 +258,101 @@ namespace Interpreter
             }
         }
 
-        private void ListExpr(AstNode node)
+        private void CallLinkedListMethod(AstNode node)
         {
-            if(!_variables.Contains(node.GetLeafs()[0].Value) && 
-                (!_variablesList.Contains(node.GetLeafs()[0].Value) || !_variablesSet.Contains(node.GetLeafs()[0].Value))) {
-
-                throw new Exception();
-            }
-
-            if (_variablesList.Contains(node.GetLeafs()[0].Value))
+            if (node.GetLeafs()[2].Value.Equals("Add"))
             {
-                if (node.GetLeafs()[2].Value.Equals("Get"))
+                if (node.GetNodes().Count == 2)
                 {
-                    if (node.GetNodes().Count == 1)
-                    {
-                        Value(node.GetNodes()[0]);
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
-                }
-                else if (node.GetLeafs()[2].Value.Equals("Size"))
-                {
-                    if (node.GetNodes().Count == 0)
-                    {
-                       // Expression(node.GetNodes()[0]);
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
-                }
-                else if (node.GetLeafs()[2].Value.Equals("Contains"))
-                {
-                    if (node.GetNodes().Count == 1)
-                    {
-                        Value(node.GetNodes()[0]);
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
+                    Value(node.GetNodes()[0]);
+                    Value(node.GetNodes()[1]);
                 }
                 else
                 {
                     throw new Exception();
                 }
             }
-            else if (_variablesSet.Contains(node.GetLeafs()[0].Value))
+            else if (node.GetLeafs()[2].Value.Equals("Size"))
             {
-                if (node.GetLeafs()[2].Value.Equals("Contains"))
+                if (node.GetNodes().Count != 0)
                 {
-
-                    if (node.GetNodes().Count == 1)
-                    {
-                        Value(node.GetNodes()[0]);
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
+                    throw new Exception();
+                }
+            }
+            else if (node.GetLeafs()[2].Value.Equals("PrintList"))
+            {
+                if (node.GetNodes().Count != 0)
+                {
+                    throw new Exception();
+                }
+            }
+            if (node.GetLeafs()[2].Value.Equals("Get"))
+            {
+                if (node.GetNodes().Count == 1)
+                {
+                    Value(node.GetNodes()[0]);
                 }
                 else
                 {
                     throw new Exception();
                 }
             }
+            else if (node.GetLeafs()[2].Value.Equals("Contains"))
+            {
+                if (node.GetNodes().Count == 1)
+                {
+                    Value(node.GetNodes()[0]);
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }    
+        }
 
-            AddOprand(node.GetLeafs()[0]);
-            AddOprand(node.GetLeafs()[2]);
+        private void CallHashSetMethod(AstNode node)
+        {
+            if (node.GetLeafs()[2].Value.Equals("Add"))
+            {
+                if (node.GetNodes().Count == 1)
+                {
+                    Value(node.GetNodes()[0]);
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+            else if (node.GetLeafs()[2].Value.Equals("Remove"))
+            {
+                if (node.GetNodes().Count == 1)
+                {
+                    Value(node.GetNodes()[0]);
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+            else if (node.GetLeafs()[2].Value.Equals("PrintSet"))
+            {
+                if (node.GetNodes().Count != 0)
+                {
+                    throw new Exception();//неизвестно значение ??
+                }
+            }
+            if (node.GetLeafs()[2].Value.Equals("Contains"))
+            {
+
+                if (node.GetNodes().Count == 1)
+                {
+                    Value(node.GetNodes()[0]);
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
         }
 
         private void BracketMember(AstNode node)
@@ -435,11 +381,11 @@ namespace Interpreter
             else if (op.TokenType == TokenType.LESS || op.TokenType == TokenType.GREATER
               || op.TokenType == TokenType.LESS_EQUAL || op.TokenType == TokenType.GREATER_EQUAL
               || op.TokenType == TokenType.NOT_EQUAL || op.TokenType == TokenType.EQUAL)
-                priority = 5;
-            else if (op.TokenType == TokenType.MINUS || op.TokenType == TokenType.PLUS)
-                priority = 9;
-            else if (op.TokenType == TokenType.MULT || op.TokenType == TokenType.DIV)
                 priority = 10;
+            else if (op.TokenType == TokenType.MINUS || op.TokenType == TokenType.PLUS)
+                priority = 20;
+            else if (op.TokenType == TokenType.MULT || op.TokenType == TokenType.DIV)
+                priority = 30;
             else
                 priority = 0;
 
