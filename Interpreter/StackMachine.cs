@@ -183,7 +183,6 @@ namespace Interpreter
             }
             else if (rpn.Value.Equals("GetFirst"))
             {
-                Console.WriteLine(_linkedListVariables[name].Size() + " dsvdssd");
                 _stack.AddFirst(new Token(TokenType.VAR, Convert.ToString(_linkedListVariables[name].GetFirst())));
             }
             else if (rpn.Value.Equals("GetLast"))
@@ -196,12 +195,11 @@ namespace Interpreter
 
                 var value = index.TokenType == TokenType.VAR ? _variables[index.Value] : Convert.ToInt32(index.Value);
 
-                _stack.AddFirst(new Token(TokenType.BOOLEAN, _linkedListVariables[name].Contains(value) ? Convert.ToString(false) : Convert.ToString(true)));
+                _stack.AddFirst(new Token(TokenType.BOOLEAN, _linkedListVariables[name].Contains(value) ? Convert.ToString(true) : Convert.ToString(false)));
             }
             else if (rpn.Value.Equals("PrintLinkedList"))
             {
                 _linkedListVariables[name].PrintLinkedList();
-                Console.WriteLine();
             }
         }
 
@@ -209,39 +207,42 @@ namespace Interpreter
         {
             if (rpn.Value.Equals("Add"))
             {
-                Token index = GetFirstFromStack();
+                Token item = GetFirstFromStack();
 
-                var indexValue = Convert.ToInt32(index.Value);
+                var itemValue = Convert.ToInt32(item.Value);
 
-                _hashSetVariables[name].Add(indexValue);
+                _hashSetVariables[name].Add(itemValue);
             }
             else if (rpn.Value.Equals("Contains"))
             {
-                Token index = GetFirstFromStack();
+                Token item = GetFirstFromStack();
 
-                var indexValue = Convert.ToInt32(index.Value);
+                var itemValue = Convert.ToInt32(item.Value);
 
-                _stack.AddFirst(new Token(TokenType.BOOLEAN, _hashSetVariables[name].Contains(indexValue) ? Convert.ToString(false) : Convert.ToString(true)));
+                _stack.AddFirst(new Token(TokenType.BOOLEAN, _hashSetVariables[name].Contains(itemValue) ? Convert.ToString(true) : Convert.ToString(false)));
             }
             else if (rpn.Value.Equals("Remove"))
             {
-                Token index = GetFirstFromStack();
+                Token item = GetFirstFromStack();
 
-                var indexValue =  Convert.ToInt32(index.Value);
+                var itemValue =  Convert.ToInt32(item.Value);
 
-                _hashSetVariables[name].Remove(indexValue);
+                _hashSetVariables[name].Remove(itemValue);
             }
             else if (rpn.Value.Equals("PrintHashSet"))
             {
                 _hashSetVariables[name].PrintHashSet();
-                Console.WriteLine();
             }
         }
 
         private void PrintExpr(Token a)
         {
             var value = a.TokenType == TokenType.VAR ? _variables[a.Value] : Convert.ToInt32(a.Value);
-            Console.WriteLine(value);///////нужен ли?
+           
+            if (a.TokenType == TokenType.NUMBER)
+            {
+                Console.WriteLine(value);
+            }
         }
 
         private void DeclarateLinkedListExpr(Token token)
@@ -323,7 +324,7 @@ namespace Interpreter
 
         private int GetValue(Token valueToken)
         {
-            return valueToken.TokenType == TokenType.VAR ? (int)_variables[valueToken.Value] : Convert.ToInt32(valueToken.Value);
+            return Convert.ToInt32(valueToken.Value);
         }
 
         public void Print()

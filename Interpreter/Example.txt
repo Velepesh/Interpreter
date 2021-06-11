@@ -1,13 +1,14 @@
 ﻿a = 10;
+
 LinkedList linkedList;
 LinkedList ff;
 HashSet hashSet;
 
 ff.AddFirst(666);
-ff.AddFirst(666);
-ff.AddFirst(666);
-ff.AddFirst(666);
-linkedList.Add(0, d2130);
+ff.AddFirst(555);
+ff.AddFirst(1222);
+ff.AddFirst(1311);
+
 linkedList.Add(1, 51);
 linkedList.AddLast(2666);
 linkedList.Add(2, 32);
@@ -17,15 +18,20 @@ linkedList.AddFirst(11221);
 linkedList.Remove(2);
 
 
-hashSet.Add(10);
+
 hashSet.Add(10);
 hashSet.Add(5);
-hashSet.Add(5);
+hashSet.Add(4);
 hashSet.Add(2);
 hashSet.Add(13);
+hashSet.Add(13);
+hashSet.Add(13);
+hashSet.Add(13);
+hashSet.Add(158);
+hashSet.Add(144);
+hashSet.Remove(13);
 
-
-if (linkedList.Contains(5)) 
+if (linkedList.Contains(13)) 
 {
 	Print 5 + 2;
 } 
@@ -37,8 +43,15 @@ else
 linkedList.PrintLinkedList();
 hashSet.PrintHashSet();
 
-a = linkedList.Size();
-b = linkedList.Get(2);
+a = ff.Size();
+b = ff.Get(2);
+
 c = linkedList.GetFirst();
 d = linkedList.GetLast();
+
+f = linkedList.GetFirst();
 Print a;
+Print b;
+Print c;
+Print d;
+Print f;

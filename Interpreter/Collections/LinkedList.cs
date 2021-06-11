@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Interpreter
 {
@@ -85,7 +86,7 @@ namespace Interpreter
         {
             if (index >= Size())
             {
-                throw new IndexOutOfRangeException();
+                throw new IndexOutOfRangeException("Index was outside the bounds of the array");
             }
 
             return GetNode(index).ToString();
@@ -95,7 +96,7 @@ namespace Interpreter
         {
             if (_firstElement == null)
             {
-                throw new IndexOutOfRangeException();
+                throw new IndexOutOfRangeException("Index was outside the bounds of the array");
             }
 
             return _firstElement.ToString();
@@ -105,7 +106,7 @@ namespace Interpreter
         {
             if (_lastElement == null)
             {
-                throw new IndexOutOfRangeException();
+                throw new IndexOutOfRangeException("Index was outside the bounds of the array");
             }
 
             return _lastElement.ToString();
@@ -115,7 +116,7 @@ namespace Interpreter
         {
             if (index >= Size()) 
             {
-                throw new IndexOutOfRangeException();
+                throw new IndexOutOfRangeException("Index was outside the bounds of the array");
             }
 
             Element<object> element = GetNode(index);
@@ -175,7 +176,7 @@ namespace Interpreter
                 if (current.Next != null)
                     Console.Write(", ");
                 else
-                    Console.Write("]");
+                    Console.Write("]\n");
             }
         }
 
@@ -208,8 +209,8 @@ namespace Interpreter
             }
             else
             {
-                element.Previous.SetNext(element.Next);
-                element.Next.SetPrevious(element.Previous);
+                element.Previous.SetNext(element.Previous);
+                element.Next.SetPrevious(element.Next);
             }
 
             return element;
