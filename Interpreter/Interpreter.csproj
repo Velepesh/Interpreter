@@ -46,8 +46,8 @@
     <Compile Include="AST\AstNode.cs" />
     <Compile Include="Collections\Element.cs" />
     <Compile Include="Lexer\Lexer.cs" />
-    <Compile Include="Collections\MyHashSet.cs" />
-    <Compile Include="Collections\MyLinkedList.cs" />
+    <Compile Include="Collections\HashSet.cs" />
+    <Compile Include="Collections\LinkedList.cs" />
     <Compile Include="AST\NodeType.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Program.cs" />

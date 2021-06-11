@@ -260,7 +260,9 @@ namespace Interpreter
 
         private void CallLinkedListMethod(AstNode node)
         {
-            if (node.GetLeafs()[2].Value.Equals("Add"))
+            var value = node.GetLeafs()[2].Value;
+
+            if (value.Equals("Add"))
             {
                 if (node.GetNodes().Count == 2)
                 {
@@ -272,21 +274,7 @@ namespace Interpreter
                     throw new Exception();
                 }
             }
-            else if (node.GetLeafs()[2].Value.Equals("Size"))
-            {
-                if (node.GetNodes().Count != 0)
-                {
-                    throw new Exception();
-                }
-            }
-            else if (node.GetLeafs()[2].Value.Equals("PrintList"))
-            {
-                if (node.GetNodes().Count != 0)
-                {
-                    throw new Exception();
-                }
-            }
-            if (node.GetLeafs()[2].Value.Equals("Get"))
+            if (value.Equals("AddFirst"))
             {
                 if (node.GetNodes().Count == 1)
                 {
@@ -297,7 +285,7 @@ namespace Interpreter
                     throw new Exception();
                 }
             }
-            else if (node.GetLeafs()[2].Value.Equals("Contains"))
+            if (value.Equals("AddLast"))
             {
                 if (node.GetNodes().Count == 1)
                 {
@@ -307,12 +295,75 @@ namespace Interpreter
                 {
                     throw new Exception();
                 }
-            }    
+            }
+            else if (value.Equals("Size"))
+            {
+                if (node.GetNodes().Count != 0)
+                {
+                    throw new Exception();
+                }
+            }
+            else if (value.Equals("PrintLinkedList"))
+            {
+                if (node.GetNodes().Count != 0)
+                {
+                    throw new Exception();
+                }
+            }
+            else if (value.Equals("Get"))
+            {
+                if (node.GetNodes().Count == 1)
+                {
+                    Value(node.GetNodes()[0]);
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+            else if (value.Equals("GetFirst"))
+            {
+                if (node.GetNodes().Count != 0)
+                {
+                    throw new Exception();
+                }
+            }
+            else if (value.Equals("GetLast"))
+            {
+                if (node.GetNodes().Count != 0)
+                {
+                    throw new Exception();
+                }
+            }
+            else if (value.Equals("Contains"))
+            {
+                if (node.GetNodes().Count == 1)
+                {
+                    Value(node.GetNodes()[0]);
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+            else if (value.Equals("Remove"))
+            {
+                if (node.GetNodes().Count == 1)
+                {
+                    Value(node.GetNodes()[0]);
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
         }
 
         private void CallHashSetMethod(AstNode node)
         {
-            if (node.GetLeafs()[2].Value.Equals("Add"))
+            var value = node.GetLeafs()[2].Value;
+
+            if (value.Equals("Add"))
             {
                 if (node.GetNodes().Count == 1)
                 {
@@ -323,7 +374,7 @@ namespace Interpreter
                     throw new Exception();
                 }
             }
-            else if (node.GetLeafs()[2].Value.Equals("Remove"))
+            else if (value.Equals("Remove"))
             {
                 if (node.GetNodes().Count == 1)
                 {
@@ -334,14 +385,14 @@ namespace Interpreter
                     throw new Exception();
                 }
             }
-            else if (node.GetLeafs()[2].Value.Equals("PrintSet"))
+            else if (value.Equals("PrintHashSet"))
             {
                 if (node.GetNodes().Count != 0)
                 {
                     throw new Exception();//неизвестно значение ??
                 }
             }
-            if (node.GetLeafs()[2].Value.Equals("Contains"))
+            if (value.Equals("Contains"))
             {
 
                 if (node.GetNodes().Count == 1)
@@ -372,9 +423,9 @@ namespace Interpreter
             AddOprand(node.GetLeafs()[0]);
         }
 
-        private int GetOpPriority(Token op)
+        private int GetOperationPriority(Token op)
         {
-            int priority;
+            int priority = 0;
 
             if (op.TokenType == TokenType.ASSIGN)
                 priority = 0;
@@ -386,8 +437,6 @@ namespace Interpreter
                 priority = 20;
             else if (op.TokenType == TokenType.MULT || op.TokenType == TokenType.DIV)
                 priority = 30;
-            else
-                priority = 0;
 
             return priority;
         }
@@ -418,7 +467,7 @@ namespace Interpreter
 
             while (true)
             {
-                if (_tokens.First != null && GetOpPriority(_tokens.First.Value) > GetOpPriority(token))
+                if (_tokens.First != null && GetOperationPriority(_tokens.First.Value) > GetOperationPriority(token))
                 {
                     AddRpn();
                 }

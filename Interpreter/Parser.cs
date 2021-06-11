@@ -22,16 +22,7 @@ namespace Interpreter
 
             while (_tokens.Count > _position)
             {
-                try
-                {
-                    ParseLanguage(AstNode);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Syntax error: " + _position + " " + _currentTokenType);
-                    Console.WriteLine(e.StackTrace);
-                    break;
-                }
+                ParseLanguage(AstNode);
             }
 
             AstNode.ShowAstTree();
@@ -98,7 +89,10 @@ namespace Interpreter
 
             ParseValue(node);
 
-            node.AddLeaf(Check(TokenType.SEMICOLON));
+            if (GetPreviousTokenType() != TokenType.SEMICOLON)
+            {
+                node.AddLeaf(Check(TokenType.SEMICOLON));
+            }
         }
 
         private void ParseForExpr(AstNode astTop)
@@ -335,10 +329,12 @@ namespace Interpreter
                 }
 
                 node.AddLeaf(Check(TokenType.RIGHT_PAREN));
-
-                if(_currentTokenType == TokenType.SEMICOLON)
+                Console.WriteLine(_position + "  _position" + _currentTokenType + "  _currentTokenType");
+                if (_currentTokenType == TokenType.SEMICOLON)
                 {
+
                     node.AddLeaf(Check(TokenType.SEMICOLON));
+                    Console.WriteLine(_position + "  _position" + _currentTokenType + "  _currentTokenType");
                 }
             }
             else 
@@ -370,6 +366,11 @@ namespace Interpreter
         private TokenType GetNextTokenType()
         {
             return _tokens[_position + 1].TokenType;
+        }
+
+        private TokenType GetPreviousTokenType()
+        {
+            return _tokens[_position - 1].TokenType;
         }
 
         private TokenType Peek()

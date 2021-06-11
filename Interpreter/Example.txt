@@ -1,40 +1,44 @@
-﻿a =5;
-b = 4;
-
-for(i = 0; i < 7; i = i + 1)
-{
-	b = b + i;
-}
-
+﻿a = 10;
 LinkedList linkedList;
-LinkedList g;
+LinkedList ff;
 HashSet hashSet;
 
-linkedList.Add(0, 1);
-linkedList.Add(0, 2);
-linkedList.Add(0, 3);
-linkedList.Add(0, 3);
+ff.AddFirst(666);
+ff.AddFirst(666);
+ff.AddFirst(666);
+ff.AddFirst(666);
+linkedList.Add(0, d2130);
+linkedList.Add(1, 51);
+linkedList.AddLast(2666);
+linkedList.Add(2, 32);
+linkedList.Add(2, 2222);
+linkedList.Add(4, 444);
+linkedList.AddFirst(11221);
+linkedList.Remove(2);
+
 
 hashSet.Add(10);
 hashSet.Add(10);
 hashSet.Add(5);
 hashSet.Add(5);
+hashSet.Add(2);
 hashSet.Add(13);
-hashSet.Remove(5);
+
 
 if (linkedList.Contains(5)) 
 {
-	d = 2;
+	Print 5 + 2;
 } 
 else 
 {
-	d = 10 + a * 2;
+	Print 10 + 5 * 2;
 }
 
-hashSet.PrintSet();
+linkedList.PrintLinkedList();
+hashSet.PrintHashSet();
 
-linkedList.PrintList();
-
-
+a = linkedList.Size();
+b = linkedList.Get(2);
+c = linkedList.GetFirst();
+d = linkedList.GetLast();
 Print a;
-Print b;

@@ -1,27 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Interpreter
 {
-    class MyHashSet
+    class HashSet
     {
         readonly private int _startNumberOfCell = 4;
 
-        private MyLinkedList[] _lists;
+        private LinkedList[] _lists;
         private int _numberOfCell;
 
-        public MyHashSet()
+        public HashSet()
         {
-            _lists = new MyLinkedList[_startNumberOfCell];
+            _lists = new LinkedList[_startNumberOfCell];
 
             _numberOfCell = _startNumberOfCell;
 
             for (int index = 0; index < _lists.Length; index++)
             {
-                _lists[index] = new MyLinkedList();
+                _lists[index] = new LinkedList();
             }
         }
 
@@ -29,7 +25,7 @@ namespace Interpreter
         {
             int amount = 0;
 
-            foreach (MyLinkedList list in _lists)
+            foreach (LinkedList list in _lists)
             {
                 if (list != null && list.Size() >= 2)
                 {
@@ -43,9 +39,9 @@ namespace Interpreter
         private void Rehash()
         {
             int newCount = _numberOfCell * 2;
-            MyLinkedList[] newContent = new MyLinkedList[newCount];
+            LinkedList[] newContent = new LinkedList[newCount];
 
-            foreach (MyLinkedList list in _lists)
+            foreach (LinkedList list in _lists)
             {
                 if (list != null)
                 {
@@ -56,7 +52,7 @@ namespace Interpreter
 
                         if (newContent[newIndex] == null)
                         {
-                            newContent[newIndex] = new MyLinkedList();
+                            newContent[newIndex] = new LinkedList();
                         }
 
                         newContent[newIndex].AddFirst(element);
@@ -68,7 +64,7 @@ namespace Interpreter
             _numberOfCell = newCount;
         }
 
-        private int GetKeyValue(object value)
+        private int GetIndex(object value)
         {
             return value.GetHashCode() % _numberOfCell;
         }
@@ -80,26 +76,26 @@ namespace Interpreter
                 Rehash();
             }
 
-            int h = GetKeyValue(value);
+            int index = GetIndex(value);
 
-            if (!_lists[h].Contains(value))
+            if (!_lists[index].Contains(value))
             {
-                _lists[h].AddFirst(value);
+                _lists[index].AddFirst(value);
             }
         }
 
         public bool Contains(object value)
         {
-            int h = GetKeyValue(value);
-            return _lists[h] != null && _lists[h].Contains(value);
+            int index = GetIndex(value);
+            return _lists[index] != null && _lists[index].Contains(value);
         }
 
         public void Remove(object value)
         {
-            int keyValue = GetKeyValue(value);
+            int index = GetIndex(value);
             string objectString = value.ToString();
 
-            MyLinkedList list = _lists[keyValue];
+            LinkedList list = _lists[index];
 
             if (list != null && list.Contains(objectString))
             {
@@ -113,11 +109,11 @@ namespace Interpreter
             }
         }     
 
-        public string PrintSet()
+        public void PrintHashSet()
         {
-            string str = "{";
-            
-            foreach (MyLinkedList list in _lists)
+            string str = "[";
+
+            foreach (LinkedList list in _lists)
             {
                 if (list != null)
                 {
@@ -130,10 +126,23 @@ namespace Interpreter
 
             if (str.Length > 1)
                 str = str.Substring(0, str.Length - 2);
-            
-            str += "}";
 
-            return str;
+            str += "]";
+            Console.WriteLine(str);
+            //return str;
+
+            //Console.Write("[");
+
+            //foreach (LinkedList list in _lists)
+            //{
+            //    for (int i = 0; i < list.Size(); i++)
+            //    {
+            //        Console.Write(list.Get(i));
+            //        Console.Write(" ");
+            //    }
+            //}
+
+            //Console.Write("]");
         }
     }
 }

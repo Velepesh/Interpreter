@@ -8,14 +8,14 @@ namespace Interpreter
 {
     class Element<T>
     {
-        public T Data { get; private set; }
-        public int Value { get; private set; }
+        public T Value { get; private set; }
+
         public Element<T> Next { get; private set; }
         public Element<T> Previous { get; private set; }
 
-        public Element(T data)
+        public Element(T value)
         {
-            Data = data;
+            Value = value;
         }
 
         public void SetNext(Element<T> next)
@@ -30,7 +30,7 @@ namespace Interpreter
 
         public override string ToString()
         {
-            return Convert.ToString(Data);
+            return Convert.ToString(Value);
         }
     }
 }
