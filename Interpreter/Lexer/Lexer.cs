@@ -16,7 +16,7 @@ namespace Interpreter
             new Terminal(TokenType.DIV, "^\\/$"),
             new Terminal(TokenType.WHILE, "^while$", 1),
             new Terminal(TokenType.FOR, "^for$", 1),
-            new Terminal(TokenType.ELIF, "^elif", 1),
+            new Terminal(TokenType.ELIF, "^elif$", 1),
             new Terminal(TokenType.IF, "^if$", 1),
             new Terminal(TokenType.ELSE, "^else$", 1),
             new Terminal(TokenType.DO, "^do$", 1),
@@ -130,6 +130,8 @@ namespace Interpreter
 
         private void ShowTokens(List<Token> tokens)
         {
+            Console.WriteLine("Lexer\n");
+
             foreach (Token token in tokens)
             {
                 Console.WriteLine($"[{token.TokenType}], {token.Value}");

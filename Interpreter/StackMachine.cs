@@ -20,7 +20,7 @@ namespace Interpreter
             _rpn = rpn;
         }
 
-        public void Run()
+        public void Calculate()
         {
             for (_index = 0; _index < _rpn.Count; _index++)
             {
@@ -60,19 +60,19 @@ namespace Interpreter
                         _stack.AddFirst(LessEqual(GetFirstFromStack(), GetFirstFromStack()));
                         break;
                     case TokenType.IF:
-                        SetTransitionIndex(GetFirstFromStack(), GetFirstFromStack());
+                        CheckTransitionIndex(GetFirstFromStack(), GetFirstFromStack());
                         break;
                     case TokenType.ELIF:
-                        SetTransitionIndex(GetFirstFromStack(), GetFirstFromStack());
+                        CheckTransitionIndex(GetFirstFromStack(), GetFirstFromStack());
                         break;
                     case TokenType.WHILE:
-                        SetTransitionIndex(GetFirstFromStack(), GetFirstFromStack());
+                        CheckTransitionIndex(GetFirstFromStack(), GetFirstFromStack());
                         break;
                     case TokenType.DO:
-                        SetTransitionIndex(GetFirstFromStack(), GetFirstFromStack());
+                        CheckTransitionIndex(GetFirstFromStack(), GetFirstFromStack());
                         break;
                     case TokenType.FOR:
-                        SetTransitionIndex(GetFirstFromStack(), GetFirstFromStack());
+                        CheckTransitionIndex(GetFirstFromStack(), GetFirstFromStack());
                         break;
                     case TokenType.METHOD:
                         MethodExpr(_rpn[_index]);
@@ -81,10 +81,10 @@ namespace Interpreter
                         PrintExpr(GetFirstFromStack());
                         break;
                     case TokenType.LINKED_LIST:
-                        DeclarateLinkedListExpr(GetFirstFromStack());
+                        DeclarateLinkedList(GetFirstFromStack());
                         break;
                     case TokenType.HASH_SET:
-                        DeclarateHashSetExpr(GetFirstFromStack());
+                        DeclarateHashSet(GetFirstFromStack());
                         break;
                     case TokenType.JMP:
                         _index = Convert.ToInt32(GetFirstFromStack().Value) - 1;
@@ -109,13 +109,17 @@ namespace Interpreter
             _stack.RemoveFirst();
         }
 
-        private void SetTransitionIndex(Token jump, Token condition)///////???????
+        private void CheckTransitionIndex(Token jump, Token condition)
         {
             int jumpValue = Convert.ToInt32(jump.Value);
-            bool conditionValue = Convert.ToBoolean(condition.Value);
 
-            if (conditionValue == false)
+            if (IsJump(condition) == false)
                 _index = jumpValue - 1;
+        }
+
+        private bool IsJump(Token condition)
+        {
+            return Convert.ToBoolean(condition.Value);
         }
 
         private void MethodExpr(Token rpn)
@@ -245,7 +249,7 @@ namespace Interpreter
             }
         }
 
-        private void DeclarateLinkedListExpr(Token token)
+        private void DeclarateLinkedList(Token token)
         {
             if ((_linkedListVariables.ContainsKey(token.Value) || _variables.ContainsKey(token.Value)) == false)
             {
@@ -253,7 +257,7 @@ namespace Interpreter
             }
         }
 
-        private void DeclarateHashSetExpr(Token token)
+        private void DeclarateHashSet(Token token)
         {
             if ((_linkedListVariables.ContainsKey(token.Value) || _variables.ContainsKey(token.Value)) == false)
             {
@@ -324,7 +328,9 @@ namespace Interpreter
 
         private int GetValue(Token valueToken)
         {
-            return Convert.ToInt32(valueToken.Value);
+            int value = valueToken.TokenType == TokenType.VAR ? Convert.ToInt32(_variables[valueToken.Value]) : Convert.ToInt32(valueToken.Value);
+
+            return Convert.ToInt32(value);
         }
 
         public void Print()

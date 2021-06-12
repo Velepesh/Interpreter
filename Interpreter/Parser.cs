@@ -329,12 +329,10 @@ namespace Interpreter
                 }
 
                 node.AddLeaf(Check(TokenType.RIGHT_PAREN));
-                Console.WriteLine(_position + "  _position" + _currentTokenType + "  _currentTokenType");
+
                 if (_currentTokenType == TokenType.SEMICOLON)
                 {
-
                     node.AddLeaf(Check(TokenType.SEMICOLON));
-                    Console.WriteLine(_position + "  _position" + _currentTokenType + "  _currentTokenType");
                 }
             }
             else 

@@ -300,14 +300,14 @@ namespace Interpreter
             {
                 if (node.GetNodes().Count != 0)
                 {
-                    throw new Exception();
+                    throw new Exception("No overload for method 'method' takes 'number' arguments");
                 }
             }
             else if (value.Equals("PrintLinkedList"))
             {
                 if (node.GetNodes().Count != 0)
                 {
-                    throw new Exception();
+                    throw new Exception("No overload for method 'method' takes 'number' arguments");
                 }
             }
             else if (value.Equals("Get"))
@@ -325,14 +325,14 @@ namespace Interpreter
             {
                 if (node.GetNodes().Count != 0)
                 {
-                    throw new Exception();
+                    throw new Exception("No overload for method 'method' takes 'number' arguments");
                 }
             }
             else if (value.Equals("GetLast"))
             {
                 if (node.GetNodes().Count != 0)
                 {
-                    throw new Exception();
+                    throw new Exception("No overload for method 'method' takes 'number' arguments");
                 }
             }
             else if (value.Equals("Contains"))
@@ -389,7 +389,7 @@ namespace Interpreter
             {
                 if (node.GetNodes().Count != 0)
                 {
-                    throw new Exception();//неизвестно значение ??
+                    throw new Exception("No overload for method 'method' takes 'number' arguments");
                 }
             }
             if (value.Equals("Contains"))
@@ -492,14 +492,14 @@ namespace Interpreter
         public void Print()
         {
             Console.WriteLine("Rpn: ");
-            Console.Write($"{"№",-4} {"Name token",-20}{"Value",-20}\n");
+            Console.Write($"{"№",-5} {"Token name",-15}{"Value"}\n");
 
             int i = 0;
 
             foreach (Token token in _rpn)
             {
-                Console.Write($"{i++,-4}");
-                token.Println();
+                Console.Write($"{i++,-6}");
+                token.Print();
             }
 
             Console.WriteLine();

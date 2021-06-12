@@ -45,28 +45,27 @@ namespace Interpreter
         public void ShowAstTree()
         {
             Console.WriteLine("\nAST\n");
-            PrintNext("", "", "", true);
+            PrintNext();
         }
 
-        private void PrintNext(string format, string format2, string format3, bool isLast)
+        private void PrintNext(string indent = "", string nextIndent = "", string nodeIndent = "", bool isLast = true)
         {
-            if (isLast)
-                Console.Write(format2);
-            else
-                Console.Write(format3);
+            var marker = isLast ? nextIndent : nodeIndent;
 
-                Console.WriteLine("." + Type);
+            Console.Write(marker);
+
+            Console.WriteLine("." + Type);
 
             for (int i = 0; i < _leafs.Count; i++)
             {
                 if (i == _leafs.Count - 1 && _nodes.Count == 0)
                 {
-                    Console.Write(format + "└──");
+                    Console.Write(indent + "└──");
                     Console.WriteLine(_leafs[i].TokenType + (_leafs[i].Value == null ? "" : (" (" + _leafs[i].Value + ")")));
                 }
                 else
                 {
-                    Console.Write(format + "├──");
+                    Console.Write(indent + "├──");
                     Console.WriteLine(_leafs[i].TokenType + (_leafs[i].Value == null ? "" : (" (" + _leafs[i].Value + ")")));
                 }
             }
@@ -74,9 +73,9 @@ namespace Interpreter
             for (int i = 0; i < _nodes.Count; i++)
             {
                 if (i == _nodes.Count - 1)
-                    _nodes[i].PrintNext(format + "   ", format + "├──", format + "└──", false);
+                    _nodes[i].PrintNext(indent + "   ", indent + "├──", indent + "└──", false);
                 else
-                    _nodes[i].PrintNext(format + "│  ", format + "├──", format + "└──", true);
+                    _nodes[i].PrintNext(indent + "│  ", indent + "├──", indent + "└──", true);
             }
         }
     }

@@ -35,14 +35,13 @@ namespace Interpreter
             {
                 _lists[index].AddLast(item);
             }
-
         }
 
         public bool Contains(int item)
         {
             int index = GetIndex(item);
             LinkedList list = _lists[index];
-            Console.WriteLine(list != null && list.Contains(item));
+
             return list != null && list.Contains(item);
         }
 

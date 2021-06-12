@@ -27,12 +27,11 @@ namespace Interpreter
             Value = value;
         }
 
-
-        public void Println()
+        public void Print()
         {
             string value = Value == null ? " " : Value;
 
-            Console.WriteLine($"{TokenType, -20}{value, -20}");
+            Console.WriteLine($"{TokenType, -15}{value}");
         }
     }
 }

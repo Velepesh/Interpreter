@@ -167,17 +167,21 @@ namespace Interpreter
 
         public void PrintLinkedList()
         {
-            Console.Write("[");
+            string expression = "";
+
+            expression = "[";
 
             for (Element<object> current = _firstElement; current != null; current = current.Next)
             {
-                Console.Write(current.ToString());
+                expression += current.ToString();
 
                 if (current.Next != null)
-                    Console.Write(", ");
+                    expression += ", ";
                 else
-                    Console.Write("]\n");
+                    expression += "]";
             }
+
+            Console.WriteLine(expression);
         }
 
         private void IncreaseСounter()

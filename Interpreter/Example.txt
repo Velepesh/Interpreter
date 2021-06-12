@@ -1,5 +1,10 @@
 ﻿a = 10;
 
+for (i = 0; i < 7; i = i + 1)
+{
+	a = a + i;
+}
+
 LinkedList linkedList;
 LinkedList ff;
 HashSet hashSet;
@@ -17,8 +22,6 @@ linkedList.Add(4, 444);
 linkedList.AddFirst(11221);
 linkedList.Remove(2);
 
-
-
 hashSet.Add(10);
 hashSet.Add(5);
 hashSet.Add(4);
@@ -33,14 +36,20 @@ hashSet.Remove(13);
 
 if (linkedList.Contains(13)) 
 {
-	Print 5 + 2;
+	g = 5 + 2;
 } 
+elif(hashSet.Contains(13))
+{
+	g = (3 - 5) / 2 + 1;
+}
 else 
 {
-	Print 10 + 5 * 2;
+	g = 10 + 5 * 2;
 }
 
+ff.PrintLinkedList();
 linkedList.PrintLinkedList();
+
 hashSet.PrintHashSet();
 
 a = ff.Size();
@@ -50,8 +59,10 @@ c = linkedList.GetFirst();
 d = linkedList.GetLast();
 
 f = linkedList.GetFirst();
+
 Print a;
 Print b;
 Print c;
 Print d;
 Print f;
+Print g;

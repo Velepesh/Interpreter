@@ -34,8 +34,7 @@ namespace Interpreter
             rpn.Print();
 
             StackMachine stackMachine = new StackMachine(rpn.GetRpn());
-
-            stackMachine.Run();
+            stackMachine.Calculate();
             stackMachine.Print();
         }
     }

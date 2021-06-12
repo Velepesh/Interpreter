@@ -26,7 +26,6 @@
     LESS_EQUAL,
     NOT_EQUAL,
 
-    IDENTIFIER,
     NUMBER,
     
     AND, 
