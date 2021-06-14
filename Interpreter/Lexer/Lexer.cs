@@ -54,7 +54,7 @@ namespace Interpreter
             {
                 Token token = ExtractNextToken(input);
 
-                if (!(token.TokenType == TokenType.WHITESPACE))
+                if (token.TokenType != TokenType.WHITESPACE)
                     _tokens.Add(token);
 
                 input.Remove(0, token.Value.Length);
